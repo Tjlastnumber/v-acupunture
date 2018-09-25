@@ -28,10 +28,10 @@
       app
       :clipped-left="clipped"
     >
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-btn icon @click.stop="miniVariant = !miniVariant">
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
+      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-btn icon @click.stop="clipped = !clipped">
         <v-icon>web</v-icon>
       </v-btn>
@@ -40,14 +40,33 @@
       </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
+      <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>menu</v-icon>
-      </v-btn>
+      </v-btn> -->
+      <v-menu bottom left>
+        <v-btn
+          slot="activator"
+          icon
+        >
+          <v-icon>account_circle</v-icon>
+        </v-btn>
+
+        <v-list>
+          <v-list-tile
+            v-for="(item, i) in userMenu"
+            :key="i"
+            @click="item.click"
+          >
+            <v-icon>{{ item.icon }}</v-icon>
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
     </v-toolbar>
     <v-content>
       <router-view/>
     </v-content>
-    <v-navigation-drawer
+    <!-- <v-navigation-drawer
       temporary
       :right="right"
       v-model="rightDrawer"
@@ -62,7 +81,7 @@
           <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
         </v-list-tile>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
   </v-app>
 </template>
 
@@ -80,6 +99,13 @@ export default {
           title: "Inspire"
         }
       ],
+      userMenu: [{
+        icon: 'keyboard_return',
+        title: '退出',
+        click: () => {
+          this.$router.push('/')
+        }
+      }],
       miniVariant: false,
       right: true,
       rightDrawer: false,
