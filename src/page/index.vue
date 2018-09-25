@@ -45,7 +45,7 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <HelloWorld/>
+      <router-view/>
     </v-content>
     <v-navigation-drawer
       temporary
@@ -63,20 +63,12 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-footer :fixed="fixed" app>
-      <span>&copy; 2017</span>
-    </v-footer>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './HelloWorld'
-
 export default {
   name: "App",
-  components: {
-    HelloWorld
-  },
   data() {
     return {
       clipped: false,
