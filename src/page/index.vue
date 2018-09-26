@@ -9,45 +9,46 @@
       fixed
       app
     >
-      <v-list>
-        <v-list-tile
-          value="true"
-          v-for="(item, i) in items"
-          :key="i"
-        >
-          <v-list-tile-action>
-            <v-icon v-html="item.icon"></v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title v-text="item.title"></v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
+      <v-toolbar color="darken-1">
+        <img src="@/assets/m.png" height="36" alt="天堰">
+      </v-toolbar>
+
+        <v-list>
+          <v-list-tile
+            value="true"
+            v-for="(item, i) in items"
+            :key="i"
+            @click="item.click"
+            ripple
+          >
+            <v-list-tile-action>
+              <v-icon v-html="item.icon"></v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
     </v-navigation-drawer>
-    <v-toolbar
-      app
-      :clipped-left="clipped"
-    >
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
+
+    <v-toolbar app :clipped-left="clipped">
+      <!-- <v-btn icon @click.stop="miniVariant = !miniVariant">
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
-      </v-btn>
+      </v-btn> -->
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn icon @click.stop="clipped = !clipped">
+      <!-- <v-btn icon @click.stop="clipped = !clipped">
         <v-icon>web</v-icon>
       </v-btn>
       <v-btn icon @click.stop="fixed = !fixed">
         <v-icon>web</v-icon>
-      </v-btn>
+      </v-btn> -->
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
       <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>menu</v-icon>
       </v-btn> -->
       <v-menu bottom left>
-        <v-btn
-          slot="activator"
-          icon
-        >
+        <v-btn slot="activator" icon>
           <v-icon>account_circle</v-icon>
         </v-btn>
 
@@ -56,15 +57,19 @@
             v-for="(item, i) in userMenu"
             :key="i"
             @click="item.click"
+            ripple
           >
-            <v-icon>{{ item.icon }}</v-icon>
+
+            <v-list-tile-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-tile-action>
             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile>
         </v-list>
       </v-menu>
     </v-toolbar>
     <v-content>
-      <router-view/>
+      <router-view />
     </v-content>
     <!-- <v-navigation-drawer
       temporary
@@ -93,12 +98,14 @@ export default {
       clipped: false,
       drawer: true,
       fixed: false,
-      items: [
-        {
-          icon: "bubble_chart",
-          title: "Inspire"
+      items: [{
+        icon: "bubble_chart",
+        title: "单选题管理",
+        click: (e) => {
+          // eslint-disable-next-line
+          console.log(e)
         }
-      ],
+      }],
       userMenu: [{
         icon: 'keyboard_return',
         title: '退出',
@@ -109,9 +116,8 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: "Vuetify.js"
+      title: "穴位考题后台管理系统"
     }
   }
 }
 </script>
-

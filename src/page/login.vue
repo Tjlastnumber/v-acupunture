@@ -1,5 +1,5 @@
 <template>
-<v-app id="inspire">
+  <v-app id="inspire">
     <v-content>
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
@@ -11,8 +11,22 @@
               </v-toolbar>
               <v-card-text>
                 <v-form>
-                  <v-text-field prepend-icon="person" name="login" label="Login" type="text"></v-text-field>
-                  <v-text-field prepend-icon="lock" name="password" label="Password" id="password" type="password"></v-text-field>
+                  <v-text-field
+                    prepend-icon="person"
+                    name="login"
+                    label="登录名"
+                    type="text"
+                    v-model="loginName"
+                    autofocus
+                  ></v-text-field>
+                  <v-text-field
+                    prepend-icon="lock"
+                    name="password"
+                    label="密码"
+                    id="password"
+                    type="password"
+                    v-model="password"
+                  ></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
@@ -32,7 +46,9 @@ export default {
   name: "login",
   data() {
     return {
-      drawer: null
+      drawer: null,
+      loginName: 'Admin',
+      password: '123456'
     }
   }
 };
@@ -40,4 +56,3 @@ export default {
 
 <style>
 </style>
-

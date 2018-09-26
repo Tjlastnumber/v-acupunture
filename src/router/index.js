@@ -8,9 +8,9 @@ import index from '@/page/index.vue'
 Vue.use(Router)
 
 export const contentRouter = [{
-    path: '/',
-    name: 'HelloWorld',
-    component: helloWorld 
+    path: '',
+    name: 'HelloPage',
+    component: helloWorld
 }]
 
 export const loginRouter = [{
@@ -19,7 +19,6 @@ export const loginRouter = [{
     component: login
 }, {
     path: '/index',
-    name: 'index',
     component: index,
     children: contentRouter
 }]
