@@ -9,8 +9,8 @@
       fixed
       app
     >
-      <v-toolbar color="darken-1">
-        <img src="@/assets/m.png" height="36" alt="天堰">
+      <v-toolbar color="white">
+        <img src="@/assets/m.jpg" height="48" alt="天堰">
       </v-toolbar>
 
         <v-list>
