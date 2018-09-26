@@ -34,11 +34,6 @@ export default {
     return {
       drawer: null
     }
-  },
-  methods: {
-      login() {
-          this.$
-      }
   }
 };
 </script>

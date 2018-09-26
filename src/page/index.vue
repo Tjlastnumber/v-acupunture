@@ -103,7 +103,7 @@ export default {
         icon: 'keyboard_return',
         title: '退出',
         click: () => {
-          this.$router.push('/')
+          this.$router.replace('/')
         }
       }],
       miniVariant: false,
