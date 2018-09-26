@@ -101,9 +101,8 @@ export default {
       items: [{
         icon: "bubble_chart",
         title: "单选题管理",
-        click: (e) => {
-          // eslint-disable-next-line
-          console.log(e)
+        click: () => {
+          this.$router.push('/singleChoice')
         }
       }],
       userMenu: [{
