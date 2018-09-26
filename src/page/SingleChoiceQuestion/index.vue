@@ -27,13 +27,16 @@
                   single-line
                 ></v-select>
               </v-flex>
+              <v-btn ripple class="primary" round>
+                <v-icon>add</v-icon> 添加题目
+              </v-btn>
             </v-toolbar>
             <v-divider></v-divider>
             <v-card-text class="pa-0">
               <v-data-table
-                :headers="complex.headers"
+                :headers="questions.headers"
                 :search="search"
-                :items="complex.items"
+                :items="questions.items"
                 :rows-per-page-items="[5,10,25,50,{text:'All','value':-1}]"
                 :pagination.sync="pagination"
                 :total-items="total"
@@ -41,16 +44,19 @@
                 item-key="name"
                 no-data-text="无"
                 rows-per-page-text="每页显示数量："
-                v-model="complex.selected"
+                v-model="questions.selected"
               >
                 <template slot="items" slot-scope="props">
-                  <td>{{ props.item.name }}</td>
-                  <td class="text-xs-right">{{ props.item.calories }}</td>
-                  <td class="text-xs-right">{{ props.item.fat }}</td>
-                  <td class="text-xs-right">{{ props.item.carbs }}</td>
-                  <td class="text-xs-right">{{ props.item.protein }}</td>
-                  <td class="text-xs-right">{{ props.item.iron }}</td>
-                  <td class="text-xs-right">
+                  <td>{{ props.item.title }}</td>
+                  <td>
+                    <v-checkbox readonly hide-details v-model="props.item.ispicture" />
+                  </td>
+                  <td>{{ options[props.item.answer - 1] }}</td>
+                  <td>{{ props.item.createdate }}</td>
+                  <td>
+                    <v-switch hide-details v-model="props.item.isrelease" @change="setRelease(props.item)" />
+                  </td>
+                  <td class="text-xs-center">
                     <v-btn
                       depressed
                       outline
@@ -95,128 +101,74 @@ export default {
     return {
       search: "",
       state: '全部',
-      complex: {
+      options: ['A', 'B', 'C', 'D', 'E'],
+      questions: {
         headers: [{
-            text: 'Dessert (100g serving)',
+            text: '题目',
             align: 'left',
-            sortable: false,
-            value: 'name'
+            value: 'title'
           },
           {
-            text: 'Calories',
-            value: 'calories'
+            text: '图片题 (是/否)',
+            value: 'ispicture'
           },
           {
-            text: 'Fat (g)',
-            value: 'fat'
+            text: '正确选项',
+            value: 'answer'
           },
           {
-            text: 'Carbs (g)',
-            value: 'carbs'
-          },
-          {
-            text: 'Protein (g)',
-            value: 'protein'
-          },
-          {
-            text: 'Iron (%)',
-            value: 'iron'
+            text: '操作时间',
+            value: 'createdate'
           }, {
-            text: 'Active',
+            text: '发布',
+            value: 'isrelease'
+          }, {
+            text: '操作',
+            align: 'center',
+            sortable: false,
             value: ''
           }
         ],
         items: [{
-            value: false,
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-            iron: '1%'
-          },
-          {
-            value: false,
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-            iron: '1%'
-          },
-          {
-            value: false,
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-            iron: '7%'
-          },
-          {
-            value: false,
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-            iron: '8%'
-          },
-          {
-            value: false,
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-            iron: '16%'
-          },
-          {
-            value: false,
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-            iron: '0%'
-          },
-          {
-            value: false,
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-            iron: '2%'
-          },
-          {
-            value: false,
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-            iron: '45%'
-          },
-          {
-            value: false,
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-            iron: '22%'
-          },
-          {
-            value: false,
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-            iron: '6%'
-          }
-        ]
+          "id": "da5ebc9a-af0c-11e7-a697-02004c4f4f50",
+          "relevanceacupointname": "商阳",
+          "title": "痄腮症见高热者在基本方的基础上加",
+          "ispicture": 0,
+          "answer": 4,
+          "isrelease": 1,
+          "createdate": new Date("2017-10-12T05:19:01.000+0000").toLocaleDateString(),
+          "optiona": "太冲、曲泉",
+          "optionb": "人中、十宣",
+          "optionc": "内关、太冲",
+          "optiond": "大椎、商阳",
+          "optione": "曲泉、人中"
+        }, {
+          "id": "da5ebc9a-af0c-11e7-a697-02004c4f4f50",
+          "relevanceacupointname": "商阳",
+          "title": "痄腮症见高热者在基本方的基础上加",
+          "ispicture": 0,
+          "answer": 2,
+          "isrelease": 1,
+          "createdate": new Date("2017-10-12T05:19:01.000+0000").toLocaleDateString(),
+          "optiona": "太冲、曲泉",
+          "optionb": "人中、十宣",
+          "optionc": "内关、太冲",
+          "optiond": "大椎、商阳",
+          "optione": "曲泉、人中"
+        }, {
+          "id": "da5ebc9a-af0c-11e7-a697-02004c4f4f50",
+          "relevanceacupointname": "商阳",
+          "title": "痄腮症见高热者在基本方的基础上加",
+          "ispicture": 1,
+          "answer": 1,
+          "isrelease": 0,
+          "createdate": new Date("2017-10-12T05:19:01.000+0000").toLocaleDateString(),
+          "optiona": "太冲、曲泉",
+          "optionb": "人中、十宣",
+          "optionc": "内关、太冲",
+          "optiond": "大椎、商阳",
+          "optione": "曲泉、人中"
+        }]
       },
       pagination: {},
       total: 0,
@@ -231,6 +183,25 @@ export default {
 
       return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
     }
+  },
+
+  methods: {
+    setRelease(e) {
+      console.log(e.id, e.isrelease)
+    }
   }
 }
 </script>
+
+<style>
+.release-switch {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.release-label {
+  font-size: 13px;
+}
+</style>
