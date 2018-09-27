@@ -8,16 +8,17 @@
         <v-flex lg12>
           <v-card>
             <v-toolbar card color="white">
-              <v-text-field
-                flat
-                solo
-                prepend-icon="search"
-                placeholder="题目"
-                v-model="search"
-                hide-details
-                class="hidden-sm-and-down"
-              ></v-text-field>
-              <v-flex xs2>
+              <v-flex row xs12 sm10 md10>
+                <v-text-field
+                  flat
+                  solo
+                  prepend-icon="search"
+                  placeholder="题目"
+                  v-model="search"
+                  hide-details
+                ></v-text-field>
+              </v-flex>
+              <v-flex row xs12 sm2 md2>
                 <v-select
                   :items="['全部', '已发布', '未发布']"
                   v-model="state"
@@ -37,15 +38,15 @@
                 :headers="questions.headers"
                 :search="search"
                 :items="questions.items"
-                :rows-per-page-items="[5,10,25,50,{text:'All','value':-1}]"
                 :pagination.sync="pagination"
                 :total-items="total"
                 :loading="loading"
                 item-key="name"
                 no-data-text="无"
-                rows-per-page-text="每页显示数量："
-                v-model="questions.selected"
+                hide-actions
+                must-sort
               >
+                <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
                 <template slot="items" slot-scope="props">
                   <td>{{ props.item.title }}</td>
                   <td>
@@ -83,21 +84,40 @@
                     </v-btn>
                   </td>
                 </template>
+                <template slot="footer">
+                  <td colspan="100%">
+                    <v-layout row wrap align-center>
+                      <v-flex xs10 class="text-xs-right mt-2">每页行数:</v-flex>
+                      <v-flex xs2 sm2 md2>
+                        <v-toolbar class="elevation-0" color="white">
+                          <v-spacer />
+                          <v-select
+                            class="shrink"
+                            :items="[5,10,25,50,{text:'所有','value':-1}]"
+                            v-model="perPage"
+                            menu-props="auto"
+                            hide-details
+                            single-line
+                          ></v-select>
+                        </v-toolbar>
+                      </v-flex>
+                    </v-layout>
+                  </td>
+                </template>
               </v-data-table>
-              <div class="text-xs-center pb-3">
-                <v-pagination v-model="pagination.page" :length="pages"></v-pagination>
+              <div class="text-xs-center pt-2 pb-3">
+                <v-pagination v-model="pagination.page" :length="pages" :total-visible="10"></v-pagination>
               </div>
             </v-card-text>
           </v-card>
         </v-flex>
       </v-layout>
     </v-container>
-    <edit-dialog :show="startEdit"/>
+    <edit-dialog :show="startEdit" />
   </div>
 </template>
 
 <script>
-import qs from 'qs'
 import editDialog from './edit'
 
 export default {
@@ -113,10 +133,12 @@ export default {
         headers: [{
             text: '题目',
             align: 'left',
-            value: 'title'
+            value: 'Title',
+            width: '500px'
           },
           {
             text: '图片题 (是/否)',
+            sortable: false,
             value: 'ispicture'
           },
           {
@@ -125,10 +147,10 @@ export default {
           },
           {
             text: '操作时间',
-            value: 'createdate'
+            value: 'CreateDate'
           }, {
             text: '发布',
-            value: 'isrelease'
+            value: 'isRelease'
           }, {
             text: '操作',
             align: 'center',
@@ -136,45 +158,48 @@ export default {
             value: ''
           }
         ],
-        items: [] 
+        items: []
       },
       pagination: {},
       total: 0,
+      totalPage: 0,
       loading: true,
-      startEdit: false
+      startEdit: false,
+      perPage: 5
     }
   },
 
-  mounted ()  {
-    this.loading = true
-    this.$axios({
-      url: 'https://easy-mock.com/mock/5bab3f8c070cd35e02f8b898/example/api/singleChoiceDisplay',
-      method: 'post',
-      header: { 'Content-Type': 'application/x-www-form-urlencoded'},
-      data: qs.stringify({
-        qn: 1,
-        qnsize: 2
-      })
-    }).then(res => {
-      try {
-        const data = res.data
-        this.questions.items = data.extend.singlechoice.lists
-        this.loading = false
-      } catch (err) {
-        console.error(err)
-      }
-    }).catch(err => {
-      this.loading = false
+  mounted() {
+    this.pagination.sortBy = 'CreateDate'
+    this.getDataFromApi().then(res => {
+      this.questions.items = res.items
+      this.total = res.total
     })
   },
 
   computed: {
     pages() {
+      console.log(this.total)
       if (this.pagination.rowsPerPage == null ||
-        this.pagination.totalItems == null
+        this.total == null
       ) return 0
 
-      return Math.ceil(this.pagination.totalItems / this.pagination.rowsPerPage)
+      return Math.ceil(this.total / this.pagination.rowsPerPage)
+    },
+  },
+
+  watch: {
+    pagination: {
+      handler() {
+        this.getDataFromApi().then(res => {
+          this.questions.items = res.items
+          this.total = res.total
+        })
+      },
+      deep: true
+    },
+    perPage(val){
+      this.pagination.rowsPerPage = val
     }
   },
 
@@ -182,10 +207,49 @@ export default {
     setRelease(e) {
       console.log(e.id, e.isrelease)
     },
-    edit () {
+    edit() {
       this.$store.commit('startEdit')
-    }
+    },
+    getDataFromApi() {
+      this.loading = true
+      return new Promise((resolve, reject) => {
+        const {
+          sortBy,
+          descending,
+          page,
+          rowsPerPage
+        } = this.pagination
 
+        let query = {
+          pn: page,
+          pnsize: rowsPerPage,
+          title: this.search,
+          isrelease: 2,
+          sorttype: sortBy || 'CreateDate',
+          ascordesc: descending ? '1' : '0'
+        }
+
+        this.$api.singleChoice.getPages({
+          data: query
+        }).then(res => {
+          this.loading = false
+          try {
+            const data = res.extend.singlechoice
+            let items = data.lists
+            let total = data.totalCount
+            resolve({
+              items,
+              total
+            })
+          } catch (err) {
+            console.error(err)
+          }
+        }).catch(err => {
+          this.loading = false
+        })
+
+      })
+    }
   }
 }
 </script>

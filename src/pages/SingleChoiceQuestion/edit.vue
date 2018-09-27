@@ -72,7 +72,6 @@ export default {
   },
   computed: {
     show() {
-      console.log(this.$store)
       return this.$store.state.singleChoice.editState
     },
     formIsValid() {

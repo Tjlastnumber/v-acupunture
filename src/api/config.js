@@ -1,3 +1,4 @@
+//'http://192.168.4.115:8080'
 export default {
     method: 'post',
     baseUrl: 'https://easy-mock.com/mock/5bab3f8c070cd35e02f8b898/example',
@@ -12,5 +13,5 @@ export default {
     // 携带凭证
     withCredentials: false,
     // 返回数据类型
-    responseType: 'json'
+    // responseType: 'json'
 }

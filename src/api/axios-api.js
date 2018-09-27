@@ -11,7 +11,7 @@ export default function $axios(options) {
         const instance = axios.create({
             baseURL: config.baseUrl,
             headers: config.headers,
-            transformResponse: [data => { }]
+            // transformResponse: [data => { }]
         })
 
         // request 拦截器
@@ -66,7 +66,7 @@ export default function $axios(options) {
         // response 拦截器
         instance.interceptors.response.use(
             response => {
-                let data;
+                let data = Object.create(null)
                 // IE9时response.data是undefined，因此需要使用response.request.responseText(Stringify后的字符串)
                 if (response.data == undefined) {
                     data = response.request.responseText
@@ -74,11 +74,11 @@ export default function $axios(options) {
                     data = response.data
                 }
                 // 根据返回的code值来做不同的处理（和后端约定）
-                switch (data.code) {
-                    case '':
-                        break;
-                    default:
-                }
+                // switch (data.code) {
+                //     case '':
+                //         break;
+                //     default:
+                // }
                 // 若不是正确的返回code，且已经登录，就抛出错误
                 // const err = new Error(data.description)
 
