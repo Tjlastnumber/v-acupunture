@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import login from '@/pages/login.vue'
 import helloWorld from '@/pages/HelloWorld.vue'
-import SingleChoiceQuesiton from '@/page/SingleChoiceQuestion/index.vue'
+import SingleChoiceQuesiton from '@/pages/SingleChoiceQuestion/index.vue'
 import index from '@/pages/index.vue'
 
 // 引用 vue-router
