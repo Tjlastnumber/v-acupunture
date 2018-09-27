@@ -92,13 +92,18 @@
         </v-flex>
       </v-layout>
     </v-container>
+    <edit-dialog :show="startEdit"/>
   </div>
 </template>
 
 <script>
 import qs from 'qs'
+import editDialog from './edit'
 
 export default {
+  components: {
+    editDialog
+  },
   data() {
     return {
       search: "",
@@ -135,7 +140,8 @@ export default {
       },
       pagination: {},
       total: 0,
-      loading: true
+      loading: true,
+      startEdit: false
     }
   },
 
@@ -175,7 +181,11 @@ export default {
   methods: {
     setRelease(e) {
       console.log(e.id, e.isrelease)
+    },
+    edit () {
+      this.$store.commit('startEdit')
     }
+
   }
 }
 </script>
