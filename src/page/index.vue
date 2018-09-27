@@ -15,17 +15,17 @@
 
         <v-list>
           <v-list-tile
-            value="true"
+            :value="navActive(item.path)"
             v-for="(item, i) in items"
             :key="i"
-            @click="item.click"
+            @click="item.click(item.path)"
             ripple
           >
             <v-list-tile-action>
-              <v-icon v-html="item.icon"></v-icon>
+              <v-icon> {{ item.icon }} </v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              <v-list-tile-title >{{ item.title }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -100,14 +100,19 @@ export default {
       fixed: false,
       items: [{
         icon: "bubble_chart",
+        path: '/singleChoice',
         title: "单选题管理",
-        click: () => {
-          this.$router.push('/singleChoice')
-        }
+        click: this.navClick
+      }, {
+        icon: 'local_dining',
+        title: 'test',
+        path: '/index',
+        click: this.navClick
       }],
       userMenu: [{
         icon: 'keyboard_return',
         title: '退出',
+        path: '/',
         click: () => {
           this.$router.replace('/')
         }
@@ -116,6 +121,14 @@ export default {
       right: true,
       rightDrawer: false,
       title: "穴位考题后台管理系统"
+    }
+  },
+  methods: {
+    navClick(e) {
+      this.$router.push(e)
+    },
+    navActive(path) {
+      return this.$route.path === path
     }
   }
 }
