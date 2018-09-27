@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import login from '@/page/login.vue'
-import helloWorld from '@/page/HelloWorld.vue'
+import login from '@/pages/login.vue'
+import helloWorld from '@/pages/HelloWorld.vue'
 import SingleChoiceQuesiton from '@/page/SingleChoiceQuestion/index.vue'
-import index from '@/page/index.vue'
+import index from '@/pages/index.vue'
 
 // 引用 vue-router
 Vue.use(Router)
