@@ -52,7 +52,7 @@
                     <v-checkbox readonly hide-details v-model="props.item.ispicture" />
                   </td>
                   <td>{{ options[props.item.answer - 1] }}</td>
-                  <td>{{ props.item.createdate }}</td>
+                  <td v-dateformat="props.item.createdate"></td>
                   <td>
                     <v-switch hide-details v-model="props.item.isrelease" @change="setRelease(props.item)" />
                   </td>
