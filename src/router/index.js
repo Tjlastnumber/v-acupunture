@@ -28,7 +28,6 @@ export const loginRouter = [{
     children: contentRouter
 }]
 
-
 export default new Router({
     routes: loginRouter
 })

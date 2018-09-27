@@ -96,6 +96,8 @@
 </template>
 
 <script>
+import qs from 'qs'
+
 export default {
   data() {
     return {
@@ -129,52 +131,37 @@ export default {
             value: ''
           }
         ],
-        items: [{
-          "id": "da5ebc9a-af0c-11e7-a697-02004c4f4f50",
-          "relevanceacupointname": "商阳",
-          "title": "痄腮症见高热者在基本方的基础上加",
-          "ispicture": 0,
-          "answer": 4,
-          "isrelease": 1,
-          "createdate": new Date("2017-10-12T05:19:01.000+0000").toLocaleDateString(),
-          "optiona": "太冲、曲泉",
-          "optionb": "人中、十宣",
-          "optionc": "内关、太冲",
-          "optiond": "大椎、商阳",
-          "optione": "曲泉、人中"
-        }, {
-          "id": "da5ebc9a-af0c-11e7-a697-02004c4f4f50",
-          "relevanceacupointname": "商阳",
-          "title": "痄腮症见高热者在基本方的基础上加",
-          "ispicture": 0,
-          "answer": 2,
-          "isrelease": 1,
-          "createdate": new Date("2017-10-12T05:19:01.000+0000").toLocaleDateString(),
-          "optiona": "太冲、曲泉",
-          "optionb": "人中、十宣",
-          "optionc": "内关、太冲",
-          "optiond": "大椎、商阳",
-          "optione": "曲泉、人中"
-        }, {
-          "id": "da5ebc9a-af0c-11e7-a697-02004c4f4f50",
-          "relevanceacupointname": "商阳",
-          "title": "痄腮症见高热者在基本方的基础上加",
-          "ispicture": 1,
-          "answer": 1,
-          "isrelease": 0,
-          "createdate": new Date("2017-10-12T05:19:01.000+0000").toLocaleDateString(),
-          "optiona": "太冲、曲泉",
-          "optionb": "人中、十宣",
-          "optionc": "内关、太冲",
-          "optiond": "大椎、商阳",
-          "optione": "曲泉、人中"
-        }]
+        items: [] 
       },
       pagination: {},
       total: 0,
       loading: true
     }
   },
+
+  mounted ()  {
+    this.loading = true
+    this.$axios({
+      url: 'https://easy-mock.com/mock/5bab3f8c070cd35e02f8b898/example/api/singleChoiceDisplay',
+      method: 'post',
+      header: { 'Content-Type': 'application/x-www-form-urlencoded'},
+      data: qs.stringify({
+        qn: 1,
+        qnsize: 2
+      })
+    }).then(res => {
+      try {
+        const data = res.data
+        this.questions.items = data.extend.singlechoice.lists
+        this.loading = false
+      } catch (err) {
+        console.error(err)
+      }
+    }).catch(err => {
+      this.loading = false
+    })
+  },
+
   computed: {
     pages() {
       if (this.pagination.rowsPerPage == null ||
@@ -192,16 +179,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.release-switch {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-content: center;
-}
-
-.release-label {
-  font-size: 13px;
-}
-</style>
