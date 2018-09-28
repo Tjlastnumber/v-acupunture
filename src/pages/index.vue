@@ -106,7 +106,7 @@ export default {
       }, {
         icon: 'local_dining',
         title: 'test',
-        path: '/index',
+        path: '/',
         click: this.navClick
       }],
       userMenu: [{
@@ -114,7 +114,7 @@ export default {
         title: '退出',
         path: '/',
         click: () => {
-          this.$router.replace('/')
+          this.$router.replace('/login')
         }
       }],
       miniVariant: false,

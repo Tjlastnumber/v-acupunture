@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '../store'
+
 import login from '@/pages/login.vue'
 import helloWorld from '@/pages/HelloWorld.vue'
 import SingleChoiceQuesiton from '@/pages/SingleChoiceQuestion/index.vue'
@@ -19,15 +21,35 @@ export const contentRouter = [{
 }]
 
 export const loginRouter = [{
-    path: '/',
+    path: '/login',
     name: 'Login',
     component: login
 }, {
-    path: '/index',
+    path: '/',
     component: index,
-    children: contentRouter
+    children: contentRouter,
+        meta: {
+        auth: true
+    }
 }]
 
-export default new Router({
+const router = new Router({
     routes: loginRouter
 })
+
+/**
+ * 路由守护
+ */
+router.beforeEach((to, from, next) => {
+    console.log(to.matched)
+    if (to.matched.some(r => r.meta.auth)) {
+        if (store.state.userinfo) next()
+        else next({
+            path: '/login'
+        })
+    } else {
+        next()
+    }
+})
+
+export default router

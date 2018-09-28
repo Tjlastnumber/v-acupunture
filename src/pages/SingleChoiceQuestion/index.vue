@@ -55,7 +55,7 @@
                   <td>{{ options[props.item.answer - 1] }}</td>
                   <td v-dateformat="props.item.createdate"></td>
                   <td>
-                    <v-switch hide-details v-model="props.item.isrelease" @change="setRelease(props.item)" />
+                    <v-switch :disabled="enableRowId === props.item.id" hide-details v-model="props.item.isrelease" @change="setRelease(props.item)" />
                   </td>
                   <td class="text-xs-center">
                     <v-btn
@@ -66,7 +66,7 @@
                       dark
                       color="primary"
                       small
-                      @click.native="edit"
+                      @click.native="edit(props.item)"
                     >
                       <v-icon>edit</v-icon>
                     </v-btn>
@@ -78,7 +78,7 @@
                       dark
                       color="pink"
                       small
-                      @click.native="deleteItem"
+                      @click.native="deleteItem(props.item)"
                     >
                       <v-icon>delete</v-icon>
                     </v-btn>
@@ -94,7 +94,7 @@
                           <v-select
                             class="shrink"
                             :items="[5,10,25,50,{text:'所有','value':-1}]"
-                            v-model="perPage"
+                            v-model="pagination.rowsPerPage"
                             menu-props="auto"
                             hide-details
                             single-line
@@ -113,7 +113,25 @@
         </v-flex>
       </v-layout>
     </v-container>
-    <edit-dialog :show="startEdit" />
+
+    <!-- 编辑弹出页 -->
+    <edit-dialog :data="editItem"/>
+
+    <!-- 提示弹出框 -->
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="3000"
+    >
+      {{ snackbar.message }}
+      <v-btn
+        dark
+        flat
+        @click="snackbar.show = false"
+      >
+        关闭
+      </v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -143,14 +161,14 @@ export default {
           },
           {
             text: '正确选项',
-            value: 'answer'
+            value: 'Answer'
           },
           {
             text: '操作时间',
             value: 'CreateDate'
           }, {
             text: '发布',
-            value: 'isRelease'
+            value: 'IsRelease'
           }, {
             text: '操作',
             align: 'center',
@@ -164,22 +182,24 @@ export default {
       total: 0,
       totalPage: 0,
       loading: true,
-      startEdit: false,
-      perPage: 5
+      editItem: {},
+
+      enableRowId: '',
+      snackbar: {
+        message: '',
+        color: 'success',
+        show: false
+      }
     }
   },
 
   mounted() {
     this.pagination.sortBy = 'CreateDate'
-    this.getDataFromApi().then(res => {
-      this.questions.items = res.items
-      this.total = res.total
-    })
+    this.pagination.rowsPerPage = 10
   },
 
   computed: {
     pages() {
-      console.log(this.total)
       if (this.pagination.rowsPerPage == null ||
         this.total == null
       ) return 0
@@ -197,17 +217,40 @@ export default {
         })
       },
       deep: true
-    },
-    perPage(val){
-      this.pagination.rowsPerPage = val
     }
   },
 
   methods: {
     setRelease(e) {
-      console.log(e.id, e.isrelease)
+      this.enableRowId = e.id
+      if (e.isrelease) {
+        this.$api.singleChoice.release(e.id).then(res => {
+          if (res.code === 100) {
+            this.snackbar.color = 'success'
+            this.snackbar.message = '发布成功'
+          } else {
+            this.snackbar.color = 'error'
+            this.snackbar.message = res.msg
+          }
+          this.snackbar.show = true
+          this.enableRowId = ''
+        })
+      } else {
+        this.$api.singleChoice.rollbackRelease(e.id).then(res => {
+          if (res.code === 100) {
+            this.snackbar.color = 'success'
+            this.snackbar.message = '撤销发布成功'
+          } else {
+            this.snackbar.color = 'error'
+            this.snackbar.message = res.msg
+          }
+          this.snackbar.show = true
+          this.enableRowId = ''
+        })
+      }
     },
-    edit() {
+    edit(item) {
+      this.editItem = item
       this.$store.commit('startEdit')
     },
     getDataFromApi() {
