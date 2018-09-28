@@ -1,4 +1,5 @@
 import singleChoice from './singleChoice.js'
+import login from './login.js'
 
 const install = Vue => {
     if (install.installed) return
@@ -9,7 +10,8 @@ const install = Vue => {
         $api: {
             get() {
                 return {
-                    singleChoice: singleChoice
+                    singleChoice: singleChoice,
+                    login: login.login
                 } 
             }
         }

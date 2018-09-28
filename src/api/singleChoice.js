@@ -76,5 +76,11 @@ export const updateImage = (id, data) => {
 export default {
     getPages,
     get,
-    deleteSingleChoice
+    deleteSingleChoice,
+    release,
+    rollbackRelease,
+    add,
+    addImage,
+    update,
+    updateImage
 }
