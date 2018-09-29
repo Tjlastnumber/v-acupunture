@@ -279,7 +279,6 @@ export default {
           this.loading = false
         })
         .catch(err => {
-          console.error(err)
           this.loading = false
         })
     }

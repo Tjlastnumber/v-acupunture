@@ -50,10 +50,17 @@ const mutations = {
     [types.DELETE_ITEM](state, index) {
         state.data.lists.splice(index, 1)
     },
-    
+
     [types.DELETE_ROLLBACK](state, { cache, index }) {
         state.data.lists.splice(index, 0, cache)
-    }
+    },
+
+    [types.UPDATE](state, item) {
+        let dataItem = state.data.lists.find(e => e.id === item.id)
+        Object.keys(dataItem).map(key => {
+            dataItem[key] = item[key]
+        })
+    },
 }
 
 const actions = {
@@ -74,7 +81,7 @@ const actions = {
     /**
      * 发布考题
      */
-    [types.RELEASE]( { commit }, item) {
+    [types.RELEASE]({ commit }, item) {
         return new Promise((resolve, reject) => {
             try {
                 if (item.isrelease) {
@@ -113,7 +120,7 @@ const actions = {
     [types.DELETE_ITEM]({ commit, state }, item) {
         return new Promise((resolve, reject) => {
             const cache = item
-            const index = state.data.lists.indexOf(item) 
+            const index = state.data.lists.indexOf(item)
             /**
              * 先删除 store 中的数据, 然后再提交
              */
@@ -134,6 +141,26 @@ const actions = {
             } catch (err) {
                 commit(types.DELETE_ROLLBACK, { cache, index })
                 resolve(err)
+            }
+        })
+    },
+
+    [types.UPDATE]({ commit }, item) {
+        return new Promise((resolve, reject) => {
+            try {
+                api.update(item.id, item)
+                    .then(res => {
+                        if (res.code !== 100) {
+                            reject(res)
+                        } else {
+                            commit(types.UPDATE, item)
+                            resolve(res)
+                        }
+                    }).catch(err => {
+                        reject(err)
+                    })
+            } catch (err) {
+                reject(err)
             }
         })
     }

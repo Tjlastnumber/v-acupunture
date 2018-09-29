@@ -1,10 +1,11 @@
 import axios from './axios-api.js'
+import qs from 'qs'
 
 export const login = (data) => {
    return axios({
         url: '/api/login',
         method: 'POST',
-        data
+        data: qs.stringify(data) 
     })
 }
 

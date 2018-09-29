@@ -14,4 +14,6 @@ export const DELETE_ITEM = 'deleteItem'
 
 export const DELETE_ROLLBACK = 'deleteRollback'
 
+export const UPDATE = 'update'
+
 export const NAMESPACED = 'singleChoice/'
