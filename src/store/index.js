@@ -3,13 +3,13 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
-import singleChoice from './moduls/singleChoice.js'
+import singleChoice from './moduls/singleChoice'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        userinfo: {}
+        userinfo: undefined 
     },
     mutations: {
         login(state, userinfo) {

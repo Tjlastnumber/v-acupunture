@@ -4,14 +4,14 @@
  */
 import Vue from 'vue'
 
-Vue.directive('dateformat',
-    (el, binding, vnode) => {
+const format = Vue => {
+    Vue.directive('dateformat', (el, binding) => {
         el.innerHTML = new Date(binding.value).toLocaleDateString()
-    }
-)
+    })
 
-Vue.directive('qsOptions', (el, binding, vnode) => {
-    el.innerHTML = ['A', 'B', 'C', 'D', 'E'][binding.value - 1]
-})
+    Vue.directive('qsOptions', (el, binding) => {
+        el.innerHTML = ['A', 'B', 'C', 'D', 'E'][binding.value - 1]
+    })
+}
 
-// export default dateformat
+Vue.use(format)

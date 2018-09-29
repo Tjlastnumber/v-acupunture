@@ -5,9 +5,9 @@ import store from './store'
 import './plugins/vuetify'
 import App from './App.vue'
 import router from './router'
-import dateformat from './directive/dateformat.js'
+import './directive/format'
+import './store/types'
 
-Vue.use(dateformat)
 Vue.use(api)
 Vue.config.productionTip = false
 

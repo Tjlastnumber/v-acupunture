@@ -8,7 +8,12 @@
         <v-flex lg12>
           <v-card>
             <v-toolbar card color="white">
-              <v-flex row xs12 sm10 md10>
+              <v-flex
+                row
+                xs12
+                sm10
+                md10
+              >
                 <v-text-field
                   flat
                   solo
@@ -18,10 +23,17 @@
                   hide-details
                 ></v-text-field>
               </v-flex>
-              <v-flex row xs12 sm2 md2>
+              <v-flex
+                row
+                xs12
+                sm2
+                md2
+              >
                 <v-select
-                  :items="['全部', '已发布', '未发布']"
-                  v-model="state"
+                  :items="stateOptions"
+                  item-text="label"
+                  item-value="key"
+                  v-model="stateSelected"
                   menu-props="auto"
                   hide-details
                   label="发布状态"
@@ -35,11 +47,11 @@
             <v-divider></v-divider>
             <v-card-text class="pa-0">
               <v-data-table
-                :headers="questions.headers"
+                :headers="table.headers"
                 :search="search"
-                :items="questions.items"
+                :items="data.lists"
                 :pagination.sync="pagination"
-                :total-items="total"
+                :total-items="data.totalCount"
                 :loading="loading"
                 item-key="name"
                 no-data-text="无"
@@ -52,10 +64,15 @@
                   <td>
                     <v-checkbox readonly hide-details v-model="props.item.ispicture" />
                   </td>
-                  <td>{{ options[props.item.answer - 1] }}</td>
+                  <td v-qs-options="props.item.answer"></td>
                   <td v-dateformat="props.item.createdate"></td>
                   <td>
-                    <v-switch :disabled="enableRowId === props.item.id" hide-details v-model="props.item.isrelease" @change="setRelease(props.item)" />
+                    <v-switch
+                      :disabled="enableRowId === props.item.id"
+                      hide-details
+                      v-model="props.item.isrelease"
+                      @change="setRelease(props.item)"
+                    />
                   </td>
                   <td class="text-xs-center">
                     <v-btn
@@ -115,20 +132,12 @@
     </v-container>
 
     <!-- 编辑弹出页 -->
-    <edit-dialog :data="editItem"/>
+    <edit-dialog :data="editItem" />
 
     <!-- 提示弹出框 -->
-    <v-snackbar
-      v-model="snackbar.show"
-      :color="snackbar.color"
-      :timeout="3000"
-    >
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
       {{ snackbar.message }}
-      <v-btn
-        dark
-        flat
-        @click="snackbar.show = false"
-      >
+      <v-btn dark flat @click="snackbar.show = false">
         关闭
       </v-btn>
     </v-snackbar>
@@ -137,6 +146,8 @@
 
 <script>
 import editDialog from './edit'
+import { mapState } from 'vuex'
+import * as types from '../../store/moduls/singleChoice-types'
 
 export default {
   components: {
@@ -145,9 +156,13 @@ export default {
   data() {
     return {
       search: "",
-      state: '全部',
-      options: ['A', 'B', 'C', 'D', 'E'],
-      questions: {
+      stateSelected: 2,
+      stateOptions: [
+        { label: '全部', key: 2 },
+        { label: '已发布', key: 1 },
+        { label: '未发布', key: 0 },
+      ],
+      table: {
         headers: [{
             text: '题目',
             align: 'left',
@@ -175,12 +190,9 @@ export default {
             sortable: false,
             value: ''
           }
-        ],
-        items: []
+        ]
       },
       pagination: {},
-      total: 0,
-      totalPage: 0,
       loading: true,
       editItem: {},
 
@@ -198,100 +210,78 @@ export default {
     this.pagination.rowsPerPage = 10
   },
 
-  computed: {
+  computed: mapState({
     pages() {
       if (this.pagination.rowsPerPage == null ||
-        this.total == null
+        this.data.totalCount == null
       ) return 0
 
-      return Math.ceil(this.total / this.pagination.rowsPerPage)
+      return Math.ceil(this.data.totalCount / this.pagination.rowsPerPage)
     },
-  },
+    data: state => state.singleChoice.data
+  }),
 
   watch: {
     pagination: {
       handler() {
-        this.getDataFromApi().then(res => {
-          this.questions.items = res.items
-          this.total = res.total
-        })
+        this.getDataFromApi()
       },
       deep: true
+    },
+    stateSelected(val) {
+      this.getDataFromApi()
     }
   },
 
   methods: {
     setRelease(e) {
       this.enableRowId = e.id
-      if (e.isrelease) {
-        this.$api.singleChoice.release(e.id).then(res => {
-          if (res.code === 100) {
-            this.snackbar.color = 'success'
-            this.snackbar.message = '发布成功'
-          } else {
-            this.snackbar.color = 'error'
-            this.snackbar.message = res.msg
-          }
+      this.$store.dispatch(types.NAMESPACED + types.RELEASE, e)
+      .then( res => {
+          this.snackbar.color = 'success'
+          this.snackbar.message = '发布成功'
           this.snackbar.show = true
           this.enableRowId = ''
-        })
-      } else {
-        this.$api.singleChoice.rollbackRelease(e.id).then(res => {
-          if (res.code === 100) {
-            this.snackbar.color = 'success'
-            this.snackbar.message = '撤销发布成功'
-          } else {
-            this.snackbar.color = 'error'
-            this.snackbar.message = res.msg
-          }
+      }).catch(err => {
+          this.snackbar.color = 'error'
+          this.snackbar.message = '发布失败'
           this.snackbar.show = true
           this.enableRowId = ''
-        })
-      }
+      })
+    },
+    deleteItem(e) {
+      this.$store.dispatch(types.NAMESPACED + types.DELETE_ITEM, e)
+      .then( res => {
+        console.log(res)
+      }).catch(err => {
+        console.error(err)
+      })
     },
     edit(item) {
       this.editItem = item
-      this.$store.commit('startEdit')
+      this.$store.commit(types.NAMESPACED + types.START_EDIT)
     },
     getDataFromApi() {
       this.loading = true
-      return new Promise((resolve, reject) => {
-        const {
-          sortBy,
-          descending,
-          page,
-          rowsPerPage
-        } = this.pagination
+      const { sortBy, descending, page, rowsPerPage } = this.pagination
 
-        let query = {
-          pn: page,
-          pnsize: rowsPerPage,
-          title: this.search,
-          isrelease: 2,
-          sorttype: sortBy || 'CreateDate',
-          ascordesc: descending ? '1' : '0'
-        }
+      let query = {
+        pn: page,
+        pnsize: rowsPerPage,
+        title: this.search,
+        isrelease: this.stateSelected,
+        sorttype: sortBy || 'CreateDate',
+        ascordesc: descending ? '1' : '0'
+      }
 
-        this.$api.singleChoice.getPages({
-          data: query
-        }).then(res => {
-          this.loading = false
-          try {
-            const data = res.extend.singlechoice
-            let items = data.lists
-            let total = data.totalCount
-            resolve({
-              items,
-              total
-            })
-          } catch (err) {
-            console.error(err)
-          }
-        }).catch(err => {
+      this.$store.dispatch(types.NAMESPACED + types.GET_PAGES, query)
+        .then(() => {
           this.loading = false
         })
-
-      })
+        .catch(err => {
+          console.error(err)
+          this.loading = false
+        })
     }
   }
 }

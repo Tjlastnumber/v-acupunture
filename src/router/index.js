@@ -41,7 +41,6 @@ const router = new Router({
  * 路由守护
  */
 router.beforeEach((to, from, next) => {
-    console.log(to.matched)
     if (to.matched.some(r => r.meta.auth)) {
         if (store.state.userinfo) next()
         else next({
