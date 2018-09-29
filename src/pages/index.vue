@@ -87,10 +87,21 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer> -->
+
+    <!-- 提示弹出框 -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout" top>
+      {{ snackbar.message }}
+      <v-btn dark flat @click="snackbar.show = false">
+        关闭
+      </v-btn>
+    </v-snackbar>
   </v-app>
+
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: "App",
   data() {
@@ -122,6 +133,12 @@ export default {
       rightDrawer: false,
       title: "穴位考题后台管理系统"
     }
+  },
+  computed: mapState({
+    snackbar: state => state.snackbar
+  }),
+  mounted() {
+    this.$store.commit('successNotifation', '欢迎')
   },
   methods: {
     navClick(e) {

@@ -24,7 +24,7 @@
           <v-btn flat @click.native="close" :disabled="loading">关闭</v-btn>
           <v-btn
             color="primary"
-            :disabl="!formIsValid"
+            :disabled="!formIsValid"
             :loading="loading"
             flat
             @click.native="save"
@@ -32,21 +32,27 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <edit-image />
   </v-layout>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import * as types from '../../store/moduls/singleChoice-types'
+import editImage from './editImage'
 
 export default {
   props: {
     data: {}
   },
 
+  components: {
+    editImage
+  },
+
   data() {
     return {
-      loading: false,
       form: {
         answer: 1,
         title: '',
@@ -83,24 +89,21 @@ export default {
       this.form.title = val.title
       this.form.answer = val.answer
       let {optiona, optionb, optionc, optiond, optione} = val
-      let options = [optiona, optionb, optionc, optiond, optione]
-      options.forEach((o,index) => {
-        this.form.options[index].content = options[index]
+      new Array(optiona, optionb, optionc, optiond, optione).forEach((o, index) => {
+        this.form.options[index].content = o
       });
     }
   },
 
   computed: {
-    // show() {
-    //   return this.$store.state.singleChoice.editState
-    // },
     formIsValid() {
       return (
-        this.form.title && this.form.options.every(o => o.content)
+        this.form.title && this.form.options.every(o => o.content) && this.form.answer
       )
     },
     ...mapState({
-      show: state => state.singleChoice.editState 
+      show: state => state.singleChoice.editState,
+      loading: state => state.singleChoice.loading
     })
   },
   methods: {
@@ -110,24 +113,34 @@ export default {
 
     save() {
       this.loading = true
-      this.$store.dispatch(types.NAMESPACED + types.UPDATE, {
-        id: this.data.id,
-        ispicture: this.data.ispicture,
-        isrelease: this.data.isrelease,
-        title: this.form.title,
-        answer: this.form.answer,
-        optiona: this.form.options[0].content,
-        optionb: this.form.options[1].content,
-        optionc: this.form.options[2].content,
-        optiond: this.form.options[3].content,
-        optione: this.form.options[4].content,
-      })
-      .then(res => {
-        this.loading = false
-        this.$store.commit(types.NAMESPACED + types.END_EDIT)
-      }).catch(err => {
-        this.loading = false
-      })
+      const newData = {
+          id: this.data.id,
+          ispicture: this.data.ispicture,
+          isrelease: this.data.isrelease,
+          title: this.form.title,
+          answer: this.form.answer,
+          optiona: this.form.options[0].content,
+          optionb: this.form.options[1].content,
+          optionc: this.form.options[2].content,
+          optiond: this.form.options[3].content,
+          optione: this.form.options[4].content,
+        }
+      if (this.data.id) {
+        this.$store.dispatch(types.NAMESPACED + types.UPDATE, newData)
+        .then(() => {
+          this.$store.commit(types.NAMESPACED + types.END_EDIT)
+        }).catch(err => {
+          this.$store.commit('errorNotifation', 'update: ' + err.msg)
+        })
+      } else {
+        this.$store.dispatch(types.NAMESPACED + types.ADD, newData)
+        .then(() => {
+          this.$store.dispatch(types.NAMESPACED + types.RELOAD)
+          this.$store.commit(types.NAMESPACED + types.END_EDIT)
+        }).catch(err => {
+          this.$store.commit('errorNotifation', 'add: ' + err.msg)
+        })
+      }
     },
   }
 }

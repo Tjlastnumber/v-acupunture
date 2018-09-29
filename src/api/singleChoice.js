@@ -44,8 +44,11 @@ export const rollbackRelease = id => {
 
 export const add = (data) => {
     return axios({
-        url: '/api/addSingleChioceText',
+        url: '/api/addSingleChoiceText',
         method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         data
     })
 }

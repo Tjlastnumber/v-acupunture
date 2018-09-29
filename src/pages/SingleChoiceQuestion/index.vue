@@ -40,7 +40,7 @@
                   single-line
                 ></v-select>
               </v-flex>
-              <v-btn ripple class="primary" round>
+              <v-btn ripple class="primary" round @click="add({})">
                 <v-icon>add</v-icon> 添加题目
               </v-btn>
             </v-toolbar>
@@ -134,13 +134,6 @@
     <!-- 编辑弹出页 -->
     <edit-dialog :data="editItem" />
 
-    <!-- 提示弹出框 -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-      {{ snackbar.message }}
-      <v-btn dark flat @click="snackbar.show = false">
-        关闭
-      </v-btn>
-    </v-snackbar>
   </div>
 </template>
 
@@ -193,15 +186,10 @@ export default {
         ]
       },
       pagination: {},
-      loading: true,
+      // loading: true,
       editItem: {},
 
-      enableRowId: '',
-      snackbar: {
-        message: '',
-        color: 'success',
-        show: false
-      }
+      enableRowId: ''
     }
   },
 
@@ -210,7 +198,7 @@ export default {
     this.pagination.rowsPerPage = 10
   },
 
-  computed: mapState({
+  computed: {
     pages() {
       if (this.pagination.rowsPerPage == null ||
         this.data.totalCount == null
@@ -218,8 +206,11 @@ export default {
 
       return Math.ceil(this.data.totalCount / this.pagination.rowsPerPage)
     },
-    data: state => state.singleChoice.data
-  }),
+    ...mapState({
+      data: state => state.singleChoice.data,
+      loading: state => state.singleChoice.loading
+    })
+  },
 
   watch: {
     pagination: {
@@ -228,7 +219,7 @@ export default {
       },
       deep: true
     },
-    stateSelected(val) {
+    stateSelected() {
       this.getDataFromApi()
     }
   },
@@ -237,32 +228,34 @@ export default {
     setRelease(e) {
       this.enableRowId = e.id
       this.$store.dispatch(types.NAMESPACED + types.RELEASE, e)
-      .then( res => {
-          this.snackbar.color = 'success'
-          this.snackbar.message = '发布成功'
-          this.snackbar.show = true
+      .then(() => {
+          this.$store.commit('successNotifation', e.isrelease ? '发布成功' : '撤销成功')
           this.enableRowId = ''
-      }).catch(err => {
-          this.snackbar.color = 'error'
-          this.snackbar.message = '发布失败'
-          this.snackbar.show = true
+      }).catch(() => {
+          this.$store.commit('errorNotifation', e.isrelease ? '发布失败' : '撤销失败')
           this.enableRowId = ''
       })
     },
     deleteItem(e) {
       this.$store.dispatch(types.NAMESPACED + types.DELETE_ITEM, e)
-      .then( res => {
-        console.log(res)
-      }).catch(err => {
-        console.error(err)
-      })
+      .then( 
+        () => this.$store.commit('successNotifation', '删除成功')
+      ).catch(
+        () => this.$store.commit('errorNotifation', '删除失败')
+      )
     },
+
+    add () {
+      this.editItem = {}
+      this.$store.commit(types.NAMESPACED + types.START_EDIT)
+    },
+
     edit(item) {
       this.editItem = item
       this.$store.commit(types.NAMESPACED + types.START_EDIT)
     },
     getDataFromApi() {
-      this.loading = true
+      // this.loading = true
       const { sortBy, descending, page, rowsPerPage } = this.pagination
 
       let query = {
@@ -275,12 +268,6 @@ export default {
       }
 
       this.$store.dispatch(types.NAMESPACED + types.GET_PAGES, query)
-        .then(() => {
-          this.loading = false
-        })
-        .catch(err => {
-          this.loading = false
-        })
     }
   }
 }

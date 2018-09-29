@@ -16,4 +16,12 @@ export const DELETE_ROLLBACK = 'deleteRollback'
 
 export const UPDATE = 'update'
 
+export const ADD = 'add'
+
+export const LOADING = 'loading'
+
+export const SET_QUERY = 'setQuery'
+
+export const RELOAD = 'reload'
+
 export const NAMESPACED = 'singleChoice/'

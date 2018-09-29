@@ -6,7 +6,10 @@ import * as types from './singleChoice-types'
  */
 const state = {
     editState: false,
-    data: {}
+    editImageState: false,
+    data: {},
+    loading: false,
+    query: {}
 }
 
 const getters = {
@@ -61,6 +64,18 @@ const mutations = {
             dataItem[key] = item[key]
         })
     },
+
+    [types.ADD](state, item) {
+        state.data.lists.splice(0, 0, item)
+    },
+
+    [types.LOADING](state, status) {
+        state.loading = status
+    },
+
+    [types.SET_QUERY](state, query) {
+        state.query = query
+    }
 }
 
 const actions = {
@@ -69,13 +84,29 @@ const actions = {
      */
     [types.GET_PAGES]({ commit }, param) {
         return new Promise((resolve, reject) => {
-            api.getPages({
-                data: param
-            }).then(res => {
-                commit(types.SET_SINGLE_CHOICE, res.extend.singlechoice)
-                resolve()
-            }).catch(err => reject(err))
+            commit(types.LOADING, true)
+            try {
+                // 缓存查询条件
+                commit(types.SET_QUERY, param)
+                api.getPages({
+                    data: param
+                }).then(res => {
+                    commit(types.SET_SINGLE_CHOICE, res.extend.singlechoice)
+                    resolve()
+                }).catch(err => {
+                    reject(err)
+                }).finally(
+                    () => commit(types.LOADING, false)
+                )
+            } catch (err) {
+                commit(types.LOADING, false)
+                reject(err)
+            }
         })
+    },
+
+    [types.RELOAD]({ state, dispatch }) {
+        return dispatch(types.GET_PAGES, state.query)
     },
 
     /**
@@ -100,7 +131,7 @@ const actions = {
                     api.rollbackRelease(item.id).then(res => {
                         if (res.code !== 100) {
                             commit(types.RELEASE_ROLLBACK, { id: item.id })
-                            reject(err)
+                            reject(res)
                         } else {
                             resolve(res)
                         }
@@ -121,10 +152,10 @@ const actions = {
         return new Promise((resolve, reject) => {
             const cache = item
             const index = state.data.lists.indexOf(item)
-            /**
-             * 先删除 store 中的数据, 然后再提交
-             */
             try {
+                /**
+                 * 先删除 store 中的数据, 然后再提交
+                 */
                 commit(types.DELETE_ITEM, index)
                 api.deleteSingleChoice(item.id)
                     .then(res => {
@@ -147,6 +178,7 @@ const actions = {
 
     [types.UPDATE]({ commit }, item) {
         return new Promise((resolve, reject) => {
+            commit(types.LOADING, true)
             try {
                 api.update(item.id, item)
                     .then(res => {
@@ -158,7 +190,29 @@ const actions = {
                         }
                     }).catch(err => {
                         reject(err)
-                    })
+                    }).finally(
+                        () => commit(types.LOADING, false)
+                    )
+            } catch (err) {
+                commit(types.LOADING, false)
+                reject(err)
+            }
+        })
+    },
+
+    // eslint-disable-next-line
+    [types.ADD]({ }, item) {
+        return new Promise((resolve, reject) => {
+            try {
+                api.add(item).then(res => {
+                    if (res.code === 100) {
+                        resolve(res)
+                    } else {
+                        reject(res)
+                    }
+                }).catch(err => {
+                    reject(err)
+                })
             } catch (err) {
                 reject(err)
             }

@@ -9,7 +9,13 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        userinfo: undefined 
+        userinfo: undefined,
+        snackbar: {
+            show: false,
+            timeout: 3000,
+            color: 'success',
+            message: ''
+        }
     },
     mutations: {
         login(state, userinfo) {
@@ -17,6 +23,15 @@ export default new Vuex.Store({
         },
         SignOut(state) {
             state.userinfo = undefined
+        },
+        successNotifation(state, msg) {
+            state.snackbar.message = msg
+            state.snackbar.show = true
+        },
+        errorNotifation(state, msg) {
+            state.snackbar.message = msg
+            state.snackbar.color = 'error'
+            state.snackbar.show = true
         }
     },
     modules: {
