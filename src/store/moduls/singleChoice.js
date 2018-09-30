@@ -8,13 +8,15 @@ const state = {
     editState: false,
     editImageState: false,
     data: {},
+    editData: {},
     loading: false,
     query: {}
 }
 
 const getters = {
-    getQuestionById: (state) => (id) => {
-        return state.data.lists.find(item => item.id === id)
+    [types.GET_QUESTION_BY_ID]: (state) => (id) => {
+        let result = state.data.lists.find(item => item.id === id)
+        return result || {}
     }
 }
 
@@ -50,14 +52,23 @@ const mutations = {
         dataItem.isrelease = !dataItem.isrelease
     },
 
+    /**
+     * 删除考题
+     */
     [types.DELETE_ITEM](state, index) {
         state.data.lists.splice(index, 1)
     },
 
+    /**
+     * 删除回滚
+     */
     [types.DELETE_ROLLBACK](state, { cache, index }) {
         state.data.lists.splice(index, 0, cache)
     },
 
+    /**
+     * 修改考题
+     */
     [types.UPDATE](state, item) {
         let dataItem = state.data.lists.find(e => e.id === item.id)
         Object.keys(dataItem).map(key => {
@@ -65,16 +76,29 @@ const mutations = {
         })
     },
 
+    /**
+     * 添加考题
+     */
     [types.ADD](state, item) {
         state.data.lists.splice(0, 0, item)
     },
 
+    /**
+     * 更新加载状态
+     */
     [types.LOADING](state, status) {
         state.loading = status
     },
 
+    /**
+     * 缓存查询条件
+     */
     [types.SET_QUERY](state, query) {
         state.query = query
+    },
+
+    [types.EDIT_DATA](state, item) {
+        state.editData = item
     }
 }
 
@@ -105,6 +129,9 @@ const actions = {
         })
     },
 
+    /**
+     * 重新加载
+     */
     [types.RELOAD]({ state, dispatch }) {
         return dispatch(types.GET_PAGES, state.query)
     },
@@ -148,6 +175,9 @@ const actions = {
         })
     },
 
+    /**
+     * 删除考题
+     */
     [types.DELETE_ITEM]({ commit, state }, item) {
         return new Promise((resolve, reject) => {
             const cache = item
@@ -176,6 +206,9 @@ const actions = {
         })
     },
 
+    /**
+     * 更新考题
+     */
     [types.UPDATE]({ commit }, item) {
         return new Promise((resolve, reject) => {
             commit(types.LOADING, true)
@@ -200,10 +233,14 @@ const actions = {
         })
     },
 
+    /**
+     * 添加考题
+     */
     // eslint-disable-next-line
-    [types.ADD]({ }, item) {
+    [types.ADD]({ commit }, item) {
         return new Promise((resolve, reject) => {
             try {
+                commit(types.LOADING, true)
                 api.add(item).then(res => {
                     if (res.code === 100) {
                         resolve(res)
@@ -212,10 +249,47 @@ const actions = {
                     }
                 }).catch(err => {
                     reject(err)
-                })
+                }).finally(
+                    ()=> commit(types.LOADING, false)
+                )
             } catch (err) {
+                ()=> commit(types.LOADING, false)
                 reject(err)
             }
+        })
+    },
+
+    [types.ADDIMAGE]({ commit }, item) {
+        return new Promise((resolve, reject) => {
+            try {
+                commit(types.LOADING, true) 
+                let formData = new FormData()
+                Object.keys(item).map(key => {
+                    formData.append(key, item[key])
+                })
+
+                api.addImage(formData).then(res => {
+                    if (res.code === 100) {
+                        resolve(res)
+                    } else {
+                        reject(res)
+                    }
+                }).catch(err => {
+                    reject(err)
+                }).finally(
+                    () => commit(types.LOADING, false) 
+                )
+            } catch (err) {
+                commit(types.LOADING, false) 
+                reject(err)
+            }
+        })
+    },
+
+    [types.EDIT_DATA]({ commit }, item) {
+        return new Promise((resolve, reject) => {
+            commit(types.EDIT_DATA, item)
+            
         })
     }
 }

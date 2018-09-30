@@ -4,9 +4,10 @@ import store from '../store'
 
 import login from '@/pages/login.vue'
 import helloWorld from '@/pages/HelloWorld.vue'
-import SingleChoiceQuesiton from '@/pages/SingleChoiceQuestion/index.vue'
 import index from '@/pages/index.vue'
-
+import SingleChoiceQuestion from '@/pages/SingleChoiceQuestion/index.vue'
+import EditQuestion from '@/pages/SingleChoiceQuestion/edit.vue'
+import EditImageQuestion from '@/pages/SingleChoiceQuestion/editImage.vue'
 // 引用 vue-router
 Vue.use(Router)
 
@@ -16,8 +17,17 @@ export const contentRouter = [{
     component: helloWorld
 }, {
     path: '/singleChoice',
-    name: 'SingleChoiceQuesiton',
-    component: SingleChoiceQuesiton 
+    name: 'SingleChoiceQuestion',
+    component: SingleChoiceQuestion,
+    children: [{
+        path: '/:id',
+        name: 'EditText',
+        component: EditQuestion 
+    }, {
+        path: '/editImage/:id',
+        name: 'EditImageQuestion',
+        component: EditImageQuestion
+    }]
 }]
 
 export const loginRouter = [{
@@ -28,7 +38,7 @@ export const loginRouter = [{
     path: '/',
     component: index,
     children: contentRouter,
-        meta: {
+    meta: {
         auth: true
     }
 }]

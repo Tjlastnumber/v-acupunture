@@ -132,20 +132,22 @@
     </v-container>
 
     <!-- 编辑弹出页 -->
-    <edit-dialog :data="editItem" />
+    <v-layout>
+      <v-dialog content-class="edit-dialog" v-model="show" persistent max-width="800px">
+        <transition name="slide-left" mode="out-in">
+          <router-view />
+        </transition>
+      </v-dialog>
+    </v-layout>
 
   </div>
 </template>
 
 <script>
-import editDialog from './edit'
 import { mapState } from 'vuex'
 import * as types from '../../store/moduls/singleChoice-types'
 
 export default {
-  components: {
-    editDialog
-  },
   data() {
     return {
       search: "",
@@ -208,7 +210,8 @@ export default {
     },
     ...mapState({
       data: state => state.singleChoice.data,
-      loading: state => state.singleChoice.loading
+      loading: state => state.singleChoice.loading,
+      show: state => state.singleChoice.editState
     })
   },
 
@@ -246,12 +249,12 @@ export default {
     },
 
     add () {
-      this.editItem = {}
+      this.$router.replace({ name: 'EditText', params: { id: '0' } })
       this.$store.commit(types.NAMESPACED + types.START_EDIT)
     },
 
     edit(item) {
-      this.editItem = item
+      this.$router.replace({ name: item.ispicture === 0 ? 'EditText' : 'EditImageQuestion', params: { id: item.id }})
       this.$store.commit(types.NAMESPACED + types.START_EDIT)
     },
     getDataFromApi() {
@@ -272,3 +275,21 @@ export default {
   }
 }
 </script>
+
+<style>
+.slide-left-enter, .slide-right-leave-active {
+  opacity: 0;
+  -webkit-transform: translate(30px, 0);
+  transform: translate(30px, 0);
+}
+.slide-left-leave-active, .slide-right-enter {
+  opacity: 0;
+  -webkit-transform: translate(-30px, 0);
+  transform: translate(-30px, 0);
+}
+
+.edit-dialog {
+  overflow-x: hidden;
+  background: white;
+}
+</style>

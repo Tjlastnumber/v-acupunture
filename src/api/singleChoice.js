@@ -66,16 +66,22 @@ export const update = (id, data) => {
 
 export const addImage = (data) => {
     return axios({
-        url: 'api/addSingleChoiceImage',
+        url: '/api/addSingleChoiceImage',
         method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
         data
     })
 }
 
 export const updateImage = (id, data) => {
     return axios({
-        url: 'api/updateSingleChioceImage/' + id,
+        url: '/api/updateSingleChoiceImage/' + id,
         method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
         data
     })
 }

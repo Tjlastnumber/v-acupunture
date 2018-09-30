@@ -1,5 +1,7 @@
 export const SET_SINGLE_CHOICE = 'setSingleChoice'
 
+export const GET_QUESTION_BY_ID = 'getQuestionById'
+
 export const GET_PAGES = 'getPages'
 
 export const START_EDIT = 'startEdit'
@@ -18,9 +20,13 @@ export const UPDATE = 'update'
 
 export const ADD = 'add'
 
+export const ADDIMAGE = 'addImage'
+
 export const LOADING = 'loading'
 
 export const SET_QUERY = 'setQuery'
+
+export const EDIT_DATA = 'editData'
 
 export const RELOAD = 'reload'
 
