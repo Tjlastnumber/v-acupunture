@@ -1,7 +1,6 @@
 <template>
   <v-img
     aspect-ratio="1"
-    contain
     :max-height="maxHeight"
     :max-width="maxWidth"
     :src="getSrc"
@@ -28,7 +27,7 @@
       ref="uploadInput"
       style="display: none"
       type="file"
-      accept="image/png,image/gif"
+      accept="image/png,image/gif,image/jpeg"
       @change="fileChange($event)"
     >
   </v-img>
@@ -42,8 +41,7 @@ export default {
     event: 'fileChanged'
   },
   props: {
-    file: {},
-    src: '',
+    file: [String, File],
     maxWidth: {
       type: String,
       default: '50px'
@@ -60,7 +58,7 @@ export default {
   },
   computed: {
     getSrc() {
-      return this.img === '' ? this.src : this.img
+      return typeof this.file === 'string' ? this.file : this.img
     }
   },
   methods: {

@@ -119,6 +119,11 @@ export default {
         title: 'test',
         path: '/',
         click: this.navClick
+      }, {
+        icon: 'file',
+        title: '文件管理',
+        path: '/fileManager',
+        click: this.navClick
       }],
       userMenu: [{
         icon: 'keyboard_return',
@@ -145,7 +150,12 @@ export default {
       this.$router.push(e)
     },
     navActive(path) {
-      return this.$route.path === path
+      // 导航选中显示
+      if (this.$route.matched.some(r => r.meta.root)) {
+        return this.$route.matched.some(r => r.meta.root === path)
+      } else {
+        return this.$route.path === path
+      }
     }
   }
 }

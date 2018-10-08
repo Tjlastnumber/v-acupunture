@@ -1,3 +1,4 @@
+import { toFormData } from '../../utils/util'
 import api from '../../api/singleChoice'
 import * as types from './singleChoice-types'
 
@@ -15,6 +16,7 @@ const state = {
 
 const getters = {
     [types.GET_QUESTION_BY_ID]: (state) => (id) => {
+        if (!state.data.lists) return {}
         let result = state.data.lists.find(item => item.id === id)
         return result || {}
     }
@@ -263,12 +265,35 @@ const actions = {
         return new Promise((resolve, reject) => {
             try {
                 commit(types.LOADING, true) 
-                let formData = new FormData()
-                Object.keys(item).map(key => {
-                    formData.append(key, item[key])
-                })
+
+                const formData = toFormData(item)
 
                 api.addImage(formData).then(res => {
+                    if (res.code === 100) {
+                        resolve(res)
+                    } else {
+                        reject(res)
+                    }
+                }).catch(err => {
+                    reject(err)
+                }).finally(
+                    () => commit(types.LOADING, false) 
+                )
+            } catch (err) {
+                commit(types.LOADING, false) 
+                reject(err)
+            }
+        })
+    },
+
+    [types.UPDATE_IMAGE]({ commit }, { id, data }) {
+        return new Promise((resolve, reject) => {
+            try {
+                commit(types.LOADING, true) 
+
+                const formData = toFormData(data)
+
+                api.updateImage(id, formData).then(res => {
                     if (res.code === 100) {
                         resolve(res)
                     } else {

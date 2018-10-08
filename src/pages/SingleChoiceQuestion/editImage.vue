@@ -43,12 +43,13 @@
       </v-container>
     </v-card-text>
     <v-card-actions>
-      <v-btn flat @click.native="editText" :disabled="loading"> 文字题 </v-btn>
+      <v-btn flat @click.native="editText" :disabled="loading" v-show="showToggle"> 文字题 </v-btn>
       <v-spacer></v-spacer>
       <v-btn flat @click.native="close" :disabled="loading">关闭</v-btn>
       <v-btn
         color="primary"
         :loading="loading"
+        :disabled="!formIsValid"
         flat
         @click.native="save"
       >保存</v-btn>
@@ -57,90 +58,96 @@
 </template>
 
 <script>
-import {
-  mapState
-} from "vuex";
-import * as types from '../../store/moduls/singleChoice-types'
-import vUpload from '@/components/UpLoad'
+import { mapState } from "vuex";
+import * as types from "../../store/moduls/singleChoice-types";
+import vUpload from "@/components/UpLoad";
+import { deepFreeze } from "../../utils/util";
 
 export default {
   components: {
     vUpload
   },
   data() {
+    const defaultForm = Object.freeze({
+      answer: 1,
+      title: "",
+      titlePicture: "",
+      options: [
+        {
+          option: "A",
+          name: "picturepatha",
+          value: 1,
+          src: "",
+          file: null
+        },
+        {
+          option: "B",
+          name: "picturepathb",
+          value: 2,
+          src: "",
+          file: null
+        },
+        {
+          option: "C",
+          name: "picturepathc",
+          value: 3,
+          src: "",
+          file: null
+        },
+        {
+          option: "D",
+          name: "picturepathd",
+          value: 4,
+          src: "",
+          file: null
+        },
+        {
+          option: "E",
+          name: "picturepathe",
+          value: 5,
+          src: "",
+          file: null
+        }
+      ]
+    })
     return {
-      form: {
-        answer: 1,
-        title: "",
-        titleSrc: '',
-        titlePicture: {},
-        options: [{
-            option: "A",
-            name: 'picturepatha',
-            value: 1,
-            src: '',
-            file: {}
-          },
-          {
-            option: "B",
-            name: 'picturepathb',
-            value: 2,
-            src: '',
-            file: {}
-          },
-          {
-            option: "C",
-            name: 'picturepathc',
-            value: 3,
-            src: '',
-            file: {}
-          },
-          {
-            option: "D",
-            name: 'picturepathd',
-            value: 4,
-            src: '',
-            file: {}
-          },
-          {
-            option: "E",
-            name: 'picturepathe',
-            value: 5,
-            src: '',
-            file: {}
-          }
-        ]
-      },
+      form: Object.assign({}, defaultForm),
+      defaultForm,
       rules: {
-        noEmpty: [val => (val || "").length > 0 || "选项内容必须填写"]
+        noEmpty: [val => (val || "").length > 0 || "内容必须填写"]
       },
       data: {}
-    }
+    };
+  },
+  created() {
+    this.getById();
+  },
+  watch: {
+    $route: "getById"
   },
   computed: {
     formIsValid() {
       return (
         this.form.title &&
-        this.form.options.every(o => o.content) &&
-        this.form.answer
-      );
+        this.form.options.every(o => o.file !== "") &&
+        this.form.answer &&
+        this.form.titlePicture !== ""
+      )
+    },
+    showToggle() {
+      return this.data.ispicture === undefined || this.data.ispicture === 0
     },
     ...mapState({
+      resourcePath: state => state.resourcePath,
       show: state => state.singleChoice.editImageState,
       loading: state => state.singleChoice.loading
     })
   },
-  created() {
-    this.getById()
-  },
-  watch: {
-    '$route': 'getById'
-  },
   methods: {
     editText() {
       this.$router.push({
-        name: 'EditText'
-      })
+        name: "EditText"
+      });
     },
     close() {
       this.$store.commit(types.NAMESPACED + types.END_EDIT)
@@ -151,27 +158,59 @@ export default {
         ispicture: 1,
         answer: this.form.answer,
         isrelease: 0,
-        titleimagepath: this.form.titlePicture
+        files: []
+      };
+
+      if (typeof this.form.titlePicture === 'string') {
+        data.files.push(new File([], 'files'))
+      } else {
+        data.files.push(this.form.titlePicture)
       }
 
       this.form.options.forEach(option => {
-        data[option.name] = option.file
-      })
+        if (typeof option.file === 'string') {
+          data.files.push(new File([], 'files'))
+        } else {
+          data.files.push(option.file)
+        }
+      });
 
-      this.$store.dispatch(types.NAMESPACED + types.ADDIMAGE, data)
+      if (this.data.id) {
+        // 修改
+        this.$store.dispatch(types.NAMESPACED + types.UPDATE_IMAGE, { id: this.data.id, data: data })
         .then(res => {
-          console.log(res)
-        }).catch(err => console.error(err))
+          this.$store.dispatch(types.NAMESPACED + types.RELOAD)
+          this.$store.commit(types.NAMESPACED + types.END_EDIT)
+        }).catch(err=>console.error(err))
+      } else {
+        // 添加
+        this.$store
+          .dispatch(types.NAMESPACED + types.ADDIMAGE, data)
+          .then(res => {
+            this.$store.dispatch(types.NAMESPACED + types.RELOAD)
+            this.$store.commit(types.NAMESPACED + types.END_EDIT)
+          })
+          .catch(err => console.error(err))
+      }
     },
     getById() {
-      let val = this.data = this.$store.getters[types.NAMESPACED + types.GET_QUESTION_BY_ID](to.params.id)
-      this.form.id = val.id
-      this.form.title = val.title
-      this.form.answer = val.answer
-      let {optiona, optionb, optionc, optiond, optione} = val
-      new Array(optiona, optionb, optionc, optiond, optione).forEach((o, index) => {
-      })
+      let val = (this.data = this.$store.getters[
+        types.NAMESPACED + types.GET_QUESTION_BY_ID
+      ](this.$route.params.id));
+      this.form.id = val.id;
+      this.form.title = val.title;
+      this.form.answer = val.answer;
+      if (val.titleimagepath)
+        this.form.titlePicture = this.resourcePath + val.titleimagepath;
+      let { picturepatha, picturepathb, picturepathc, picturepathd, picturepathe } = val;
+      new Array( picturepatha, picturepathb, picturepathc, picturepathd, picturepathe).forEach((o, index) => {
+        if (o) {
+          this.form.options[index].file = this.resourcePath + o
+        } else {
+          this.form.options[index].file = ''
+        }
+      });
     }
-  },
+  }
 };
 </script>

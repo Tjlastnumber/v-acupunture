@@ -4,11 +4,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import singleChoice from './moduls/singleChoice'
+import apiConfig from '../api/config'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+        resourcePath: apiConfig.baseUrl + '/resources/',
         userinfo: undefined,
         snackbar: {
             show: false,

@@ -75,6 +75,17 @@ export const addImage = (data) => {
     })
 }
 
+export const addImageWithout = (id ,data) => {
+    return axios({
+        url: '/api/addImageWithoutForm/' + id,
+        method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        data
+    })
+}
+
 export const updateImage = (id, data) => {
     return axios({
         url: '/api/updateSingleChoiceImage/' + id,
@@ -94,6 +105,7 @@ export default {
     rollbackRelease,
     add,
     addImage,
+    addImageWithout,
     update,
     updateImage
 }
