@@ -38,18 +38,28 @@
         </v-layout>
       </v-container>
     </v-content>
+
+    <!-- 提示弹出框 -->
+    <v-snackbar v-model="messageShow" color="error">
+      {{ message }}
+      <v-btn dark flat @click="messageShow = false">
+        关闭
+      </v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 
 <script>
 export default {
-  name: "login",
+  name: "Login",
   data() {
     return {
       loading: false,
       drawer: null,
       loginName: 'Admin',
-      password: '123456'
+      password: '123456',
+      message: '',
+      messageShow: false 
     }
   },
   mounted() {
@@ -64,17 +74,17 @@ export default {
         role: 'admin',
         path: ''
       }).then(res => {
-        this.loading = false
         if (res.code === 100) {
           this.$store.commit('login', res.extend.userinfo)
           this.$router.push('/')
         } else {
-          console.error(res.msg)
+          this.messageShow = true
+          this.message = '登陆失败'
         }
       }).catch (err => {
-        this.loading = false
-        console.log(err)
-      })
+        this.messageShow = true
+        this.message = '登陆失败'
+      }).finally(() => { this.loading = false })
     }
   }
 };

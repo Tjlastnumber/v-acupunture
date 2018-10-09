@@ -148,6 +148,7 @@ import { mapState } from 'vuex'
 import * as types from '../../store/moduls/singleChoice-types'
 
 export default {
+  name: 'SingleChoice',
   data() {
     return {
       search: "",

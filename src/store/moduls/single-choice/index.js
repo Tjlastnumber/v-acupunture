@@ -1,5 +1,5 @@
-import { toFormData } from '../../utils/util'
-import api from '../../api/singleChoice'
+import { toFormData } from '../../../utils/util'
+import api from '../../../api/single-choice'
 import * as types from './singleChoice-types'
 
 /**

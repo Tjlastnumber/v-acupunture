@@ -7,6 +7,10 @@ export function isObject(obj) {
     return obj !== null && typeof obj === 'object'
 }
 
+/**
+ * Object 深度冻结
+ * @param {Object} obj 冻结对象
+ */
 export function deepFreeze(obj) {
     // 取回定义在obj上的属性名
     var propNames = Object.getOwnPropertyNames(obj);
@@ -19,11 +23,6 @@ export function deepFreeze(obj) {
         if (isObject(prop)) {
             deepFreeze(prop)
         }
-        // else if (Array.isArray(prop)) {
-        //     prop.forEach(p => {
-        //         deepFreeze(p)
-        //     })
-        // }
     });
 
     // 冻结自身(no-op if already frozen)

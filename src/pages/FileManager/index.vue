@@ -1,7 +1,7 @@
 <template>
   <v-container fluid grid-list-md>
     <v-data-iterator
-      :items="items"
+      :items="[{ name: 'test' }]"
       :rows-per-page-items="rowsPerPageItems"
       :pagination.sync="pagination"
       content-tag="v-layout"
@@ -58,7 +58,14 @@
 </template>
 
 <script>
-export default {};
+export default {
+  name: 'FileManager',
+  data() {
+    return {
+      items: []
+    }
+  }
+}
 </script>
 
 <style>

@@ -33,9 +33,9 @@
 </template>
 
 <script>
-import { mapState, map } from "vuex";
-import * as types from "../../store/moduls/singleChoice-types";
-import editImage from "./editImage";
+import { mapState, map } from "vuex"
+import * as types from "@/store/moduls/single-choice/singleChoice-types"
+import editImage from "./EditImage"
 
 export default {
   components: {

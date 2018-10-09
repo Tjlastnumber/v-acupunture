@@ -17,15 +17,15 @@
           <v-list-tile
             :value="navActive(item.path)"
             v-for="(item, i) in items"
+            @click="item.meta.click(item.name)"
             :key="i"
-            @click="item.click(item.path)"
             ripple
           >
             <v-list-tile-action>
-              <v-icon> {{ item.icon }} </v-icon>
+              <v-icon> {{ item.meta.icon }} </v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title >{{ item.title }}</v-list-tile-title>
+              <v-list-tile-title >{{ item.meta.title }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -69,7 +69,9 @@
       </v-menu>
     </v-toolbar>
     <v-content>
-      <router-view />
+      <transition name="fade" mode="out-in">
+        <router-view />
+      </transition>
     </v-content>
     <!-- <v-navigation-drawer
       temporary
@@ -101,6 +103,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { contentRouter } from '@/router/index'
 
 export default {
   name: "App",
@@ -109,22 +112,8 @@ export default {
       clipped: false,
       drawer: true,
       fixed: false,
-      items: [{
-        icon: "bubble_chart",
-        path: '/singleChoice',
-        title: "单选题管理",
-        click: this.navClick
-      }, {
-        icon: 'local_dining',
-        title: 'test',
-        path: '/',
-        click: this.navClick
-      }, {
-        icon: 'file',
-        title: '文件管理',
-        path: '/fileManager',
-        click: this.navClick
-      }],
+      items: [], 
+      contentRouter,
       userMenu: [{
         icon: 'keyboard_return',
         title: '退出',
@@ -144,10 +133,16 @@ export default {
   }),
   mounted() {
     this.$store.commit('successNotifation', '欢迎')
+
+    contentRouter.map((v) => {
+      v.meta.click = path => this.navClick(path)
+    })
+
+    this.items = contentRouter
   },
   methods: {
     navClick(e) {
-      this.$router.push(e)
+      this.$router.push({ name: e })
     },
     navActive(path) {
       // 导航选中显示
@@ -160,3 +155,12 @@ export default {
   }
 }
 </script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s ease;
+}
+.fade-enter, .fade-leave-active {
+  opacity: 0
+}
+</style>

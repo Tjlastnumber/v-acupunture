@@ -1,5 +1,5 @@
-import singleChoice from './singleChoice.js'
-import login from './login.js'
+import singleChoice from './single-choice'
+import login from './login'
 
 const install = Vue => {
     if (install.installed) return

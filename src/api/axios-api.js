@@ -40,10 +40,6 @@ export default function $axios(options) {
             },
             error => {
                 // 请求错误时做些事(接口错误、超时等)
-                // Tip: 4
-                // 关闭loadding
-                console.log('request:', error)
-
                 //  1.判断请求超时
                 if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {
                     console.log('根据你设置的timeout/真的请求超时 判断请求现在超时了，你可以在这里加入超时的处理方案')
@@ -51,7 +47,6 @@ export default function $axios(options) {
                 }
                 //  2.需要重定向到错误页面
                 const errorInfo = error.response
-                console.log(errorInfo)
                 if (errorInfo) {
                     // error =errorInfo.data//页面那边catch的时候就能拿到详细的错误信息,看最下边的Promise.reject
                     // const errorStatus = errorInfo.status; // 404 403 500 ... 等
@@ -138,7 +133,6 @@ export default function $axios(options) {
                         default:
                     }
                 }
-                console.error(err)
                 // 此处我使用的是 element UI 的提示组件
                 // Message.error(`ERROR: ${err}`);
                 return Promise.reject(err) // 返回接口返回的错误信息

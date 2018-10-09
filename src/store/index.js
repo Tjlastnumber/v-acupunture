@@ -3,7 +3,8 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
-import singleChoice from './moduls/singleChoice'
+import singleChoice from './moduls/single-choice'
+import fileManager from './moduls/file-manager'
 import apiConfig from '../api/config'
 
 Vue.use(Vuex)
@@ -37,6 +38,7 @@ export default new Vuex.Store({
         }
     },
     modules: {
-        singleChoice
+        singleChoice,
+        fileManager
     }
 })
