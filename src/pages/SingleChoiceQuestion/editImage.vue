@@ -59,7 +59,7 @@
 
 <script>
 import { mapState } from "vuex";
-import * as types from "../../store/moduls/singleChoice-types";
+import * as types from '../../store/moduls/single-choice/singleChoice-types'
 import vUpload from "@/components/UpLoad";
 import { deepFreeze } from "../../utils/util";
 
