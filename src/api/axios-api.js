@@ -1,10 +1,8 @@
 /**
  * axios api 封装
  */
-
 import axios from 'axios'
 import config from './config.js'
-import qs from 'qs'
 
 export default function $axios(options) {
     return new Promise((resolve, reject) => {
@@ -39,6 +37,9 @@ export default function $axios(options) {
                 return config
             },
             error => {
+                if (axios.isCancel(err)) {
+                    console.log('axios request cancel ->' + err.message)
+                }
                 // 请求错误时做些事(接口错误、超时等)
                 //  1.判断请求超时
                 if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {

@@ -38,7 +38,7 @@
             class="shrink mr-5"
           />
           <v-spacer />
-          <v-upload v-model="item.file" :src="item.src" />
+          <v-upload v-model="item.file" accept="image/png,image/gif,image/jpeg" :src="item.src" />
         </v-layout>
       </v-container>
     </v-card-text>

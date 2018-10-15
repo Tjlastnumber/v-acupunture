@@ -27,7 +27,7 @@
       ref="uploadInput"
       style="display: none"
       type="file"
-      accept="image/png,image/gif,image/jpeg"
+      :accept="accept"
       @change="fileChange($event)"
     >
   </v-img>
@@ -42,6 +42,10 @@ export default {
   },
   props: {
     file: [String, File],
+    accept: {
+      type: String,
+      default: ''
+    },
     maxWidth: {
       type: String,
       default: '50px'

@@ -4,9 +4,43 @@
  */
 import Vue from 'vue'
 
+const formatNumber = n => {
+    n = n.toString()
+    return n[1] ? n : '0' + n
+}
+
 const format = Vue => {
     Vue.directive('dateformat', (el, binding) => {
-        el.innerHTML = new Date(binding.value).toLocaleDateString()
+        const date = new Date(binding.value)
+        const year = date.getFullYear()
+        const month = date.getMonth() + 1
+        const day = date.getDate()
+        const hour = date.getHours()
+        const minute = date.getMinutes()
+        const second = date.getSeconds()
+        if (binding.arg) {
+            const arg = binding.arg.toLocaleLowerCase()
+            switch (arg) {
+                case 'year':
+                    el.innerHTML = year
+                    break;
+                case 'month':
+                    el.innerHTML = [year, month].map(formatNumber).join('/')
+                    break; 
+                case 'date':
+                    el.innerHTML = [year, month, day].map(formatNumber).join('/')
+                    break;
+                case 'full':
+                    el.innerHTML = [year, month, day].map(formatNumber).join('/') + 
+                                   [hour, minute, second].map(formatNumber).join(':')
+                    break;
+                default:
+                    el.innerHTML = new Date(binding.value).toLocaleDateString()
+                    break;
+            }
+        } else {
+            el.innerHTML = new Date(binding.value).toLocaleDateString()
+        }
     })
 
     Vue.directive('qsOptions', (el, binding) => {

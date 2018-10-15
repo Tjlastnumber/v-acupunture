@@ -11,7 +11,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        resourcePath: apiConfig.baseUrl + '/resources/',
+        resourcePath: apiConfig.baseUrl + '/resources',
         userinfo: undefined,
         snackbar: {
             show: false,
