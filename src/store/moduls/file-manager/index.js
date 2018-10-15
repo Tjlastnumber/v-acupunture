@@ -64,6 +64,12 @@ const mutations = {
         if (index !== -1) {
             state.files.splice(index, 1)
         }
+    },
+
+    [types.DELETE_ROLLBACK](state, { cache, index }) {
+        if (index !== -1) {
+            state.files.splice(index, 0, cache)
+        }
     }
 }
 
@@ -150,21 +156,27 @@ const actions = {
         commit(types.REQUEST_CANCEL, { file, message })
     },
 
-    [types.DELETE]({ commit }, { file }) {
+    [types.DELETE]({ state, commit }, file) {
         return new Promise((resolve, reject) => {
             const cache = file
-            commit(types.DELETE, file)
-            api.deleteFile(file.id).then(res => {
-                if (res.code === 100) {
-                    resolve(res)
-                } else {
-                    commit(types.DELETE_ROLLBACK, cache)
-                    reject(res)
-                }
-            }).catch(err => {
-                commit(types.DELETE_ROLLBACK, cache)
+            const index = state.files.indexOf(file)
+            try {
+                commit(types.DELETE, file)
+                api.deleteFile(file.id).then(res => {
+                    if (res.code === 100) {
+                        resolve(res)
+                    } else {
+                        commit(types.DELETE_ROLLBACK, { cache, index })
+                        reject(res)
+                    }
+                }).catch(err => {
+                    commit(types.DELETE_ROLLBACK, { cache, index })
+                    reject(err)
+                })
+            } catch (err) {
+                commit(types.DELETE_ROLLBACK, { cache, index })
                 reject(err)
-            })
+            }
         })
     }
 }

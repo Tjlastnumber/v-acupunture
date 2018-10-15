@@ -46,6 +46,7 @@
                       flat
                       icon
                       color="pink"
+                      @click.native="deleteFile(props.item)"
                     >
                       <v-icon>delete</v-icon>
                     </v-btn>
@@ -176,6 +177,13 @@ export default {
       this.$store.dispatch(types.NAMESPACED + types.REQUEST_CANCEL, {
         file,
         message: '取消请求'
+      })
+    },
+    deleteFile(file) {
+      this.$store.dispatch(types.NAMESPACED + types.DELETE, file).then(res => {
+        this.$store.commit('successNotifation', '删除成功')
+      }).catch(err => {
+        this.$store.commit('errorNotifation', err.message)
       })
     }
   }

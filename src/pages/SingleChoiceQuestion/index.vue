@@ -202,7 +202,6 @@ export default {
         ]
       },
       pagination: {},
-      // loading: true,
       editItem: {},
 
       enableRowId: ''
