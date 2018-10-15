@@ -9,6 +9,7 @@ export const CHANGE_PROGRESS = 'changeProgress'
 export const SHOW_PROGRESS = 'showProgress'
 export const DELETE = 'fileDelete'
 export const UPDATE_ROLLBACK = 'updateRollback'
+export const DELETE_ROLLBACK = 'deleteRollback'
 
 export const REQUEST_CANCEL = 'requestCancel'
 export const SET_CANCEL_TOKEN = 'setCancelToken'

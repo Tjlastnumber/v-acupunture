@@ -58,8 +58,19 @@
                 hide-actions
                 must-sort
               >
-                <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+                <!-- <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear> -->
+                <template slot="progress">
+                  <div class="loading-mask">
+                    <v-progress-circular
+                      :size="70"
+                      color="blue"
+                      indeterminate
+                    ></v-progress-circular>
+                  </div>
+                </template>
                 <template slot="items" slot-scope="props">
+                  <transition name="slide-left">
+                    <tr style="width: 100%">
                   <td>{{ props.item.title }}</td>
                   <td>
                     <v-checkbox readonly hide-details v-model="props.item.ispicture" />
@@ -100,6 +111,8 @@
                       <v-icon>delete</v-icon>
                     </v-btn>
                   </td>
+                    </tr>
+                  </transition>
                 </template>
                 <template slot="footer">
                   <td colspan="100%">
@@ -278,19 +291,44 @@ export default {
 </script>
 
 <style>
-.slide-left-enter, .slide-right-leave-active {
+.slide-left-enter,
+.slide-left-leave-active
+{
   opacity: 0;
-  -webkit-transform: translate(30px, 0);
-  transform: translate(30px, 0);
 }
-.slide-left-leave-active, .slide-right-enter {
-  opacity: 0;
-  -webkit-transform: translate(-30px, 0);
-  transform: translate(-30px, 0);
+
+.slide-left-enter {
+  -webkit-transform: translate(100%, 0);
+  transform: translate(100%, 0);
 }
+
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: all .2s cubic-bezier(0.86, 0, 0.07, 1);
+  -webkit-transition: all .2s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.slide-left-leave-active {
+  -webkit-transform: translate(-100%, 0);
+  transform: translate(-100%, 0);
+}
+
 
 .edit-dialog {
   overflow-x: hidden;
   background: white;
+}
+
+.loading-mask {
+  position: absolute; 
+  background: rgba(0, 0, 0, .3); 
+  top: 0; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

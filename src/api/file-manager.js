@@ -31,3 +31,10 @@ export const download = ({ filename, onDownloadProgress, cancelToken }) => {
         cancelToken
     })
 }
+
+export const deleteFile = ({ id }) => {
+    return api({
+        url: '/api/deleteFile/' + id,
+        method: 'get'
+    })
+}

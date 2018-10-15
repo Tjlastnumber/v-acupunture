@@ -39,6 +39,18 @@
               <v-card>
                 <v-card-title>
                   <h4>{{ props.item.fileName }}</h4>
+                  <v-spacer />
+                  <v-tooltip bottom>
+                    <v-btn
+                      slot="activator"
+                      flat
+                      icon
+                      color="pink"
+                    >
+                      <v-icon>delete</v-icon>
+                    </v-btn>
+                    <span>删除文件</span>
+                  </v-tooltip>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-progress-linear :query="true" :active="props.item.downloading" v-model="props.item.progress"></v-progress-linear>
@@ -63,12 +75,30 @@
                 <v-divider></v-divider>
                 <v-card-actions>
                   <v-spacer />
-                  <v-btn v-if="!props.item.downloading" color="primary" flat @click="download(props.item)" >
-                    下载
-                  </v-btn>
-                  <v-btn v-else color="primary" flat @click="cancelRequest(props.item)" >
-                    取消
-                  </v-btn>
+                  <v-tooltip v-if="!props.item.downloading" bottom>
+                    <v-btn
+                      slot="activator"
+                      key="download"
+                      color="primary"
+                      flat
+                      @click="download(props.item)"
+                    >
+                      <v-icon>cloud_download</v-icon>
+                    </v-btn>
+                    <span>下载</span>
+                  </v-tooltip>
+                  <v-tooltip v-else bottom>
+                    <v-btn
+                      slot="activator"
+                      key="cancel"
+                      color="primary"
+                      flat
+                      @click="cancelRequest(props.item)"
+                    >
+                      <v-icon>cancel</v-icon>
+                    </v-btn>
+                    <span>取消</span>
+                  </v-tooltip>
                 </v-card-actions>
               </v-card>
             </v-flex>
@@ -122,20 +152,22 @@ export default {
           file
         })
         .then(res => {
-           const url = window.URL.createObjectURL(new Blob([res]))
-           const link = document.createElement('a')
-           link.href = url
-           link.setAttribute('download', file.fileName)
-           document.body.appendChild(link)
-           link.click()
-           window.URL.revokeObjectURL(link.href)
-           document.body.removeChild(link)
+          const url = window.URL.createObjectURL(new Blob([res]))
+          const link = document.createElement('a')
+          link.href = url
+          link.setAttribute('download', file.fileName)
+          document.body.appendChild(link)
+          link.click()
+          window.URL.revokeObjectURL(link.href)
+          document.body.removeChild(link)
         }).catch(err => console.error(err))
     },
     fileChange(el) {
       if (!el.target.files[0]) return
       let file = el.target.files[0]
-      this.$store.dispatch(types.NAMESPACED + types.UPLOAD, { file }).catch(err=> {
+      this.$store.dispatch(types.NAMESPACED + types.UPLOAD, {
+        file
+      }).catch(err => {
         el.value = ''
         console.log(err)
       })
@@ -151,4 +183,34 @@ export default {
 </script>
 
 <style>
+.translate-fade-enter-active,
+.translate-fade-leave-active {
+  transition: all .3s;
+}
+
+.translate-fade-enter,
+.translate-fade-leave-active {
+  opacity: 0;
+}
+
+.translate-fade-enter {
+  transform: translateY(100%);
+}
+
+.translate-fade-leave-active {
+  transform: translateY(-100%)
+}
+
+.loading-mask {
+  position: absolute;
+  background: rgba(0, 0, 0, .3);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>

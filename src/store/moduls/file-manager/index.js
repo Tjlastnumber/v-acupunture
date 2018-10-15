@@ -57,71 +57,68 @@ const mutations = {
     [types.UPDATE_ROLLBACK](state, file) {
         const index = state.files.indexOf(file)
         state.files.splice(index, 1)
+    },
+
+    [types.DELETE](state, file) {
+        const index = state.files.indexOf(file)
+        if (index !== -1) {
+            state.files.splice(index, 1)
+        }
     }
 }
 
 const actions = {
     [types.GET_FILE_LIST]({ commit }) {
         return new Promise((resolve, reject) => {
-            try {
-                api.getFileList().then(res => {
-                    if (res.code === 100) {
-                        commit(types.SET_FILE_LIST, res.extend.list)
-                        resolve(res)
-                    } else {
-                        reject(res)
-                    }
-                }).catch(err => reject(err))
-            } catch (err) {
-                reject(err)
-            }
+            api.getFileList().then(res => {
+                if (res.code === 100) {
+                    commit(types.SET_FILE_LIST, res.extend.list)
+                    resolve(res)
+                } else {
+                    reject(res)
+                }
+            }).catch(err => reject(err))
         })
     },
 
     [types.UPLOAD]({ commit, dispatch }, { file }) {
         return new Promise((resolve, reject) => {
-            try {
-                console.log('update')
-                let formData = new FormData()
-                formData.append('file', file)
-                file = {
-                    id: new Date().toISOString(),
-                    fileName: file.name,
-                    filePath: '',
-                    updateTime: new Date().toString(),
-                    fileSize: file.size,
-                    progress: 0,
-                    downloading: false,
-                    cancelSource: axios.CancelToken.source()
-                }
-                const cancelToken = file.cancelSource.token
-                commit(types.UPLOAD, file)
-                commit(types.SHOW_PROGRESS, { id: file.id, show: true })
-                const onUploadProgress = progressEvent => {
-                    commit(types.CHANGE_PROGRESS, { id: file.id, progressEvent })
-                }
-                api.upload({ file: formData, onUploadProgress, cancelToken })
-                    .then(res => {
-                        if (res.code === 100) {
-                            dispatch(types.GET_FILE_LIST)
-                            resolve(res)
-                        } else {
-                            reject(res)
-                        }
-                    })
-                    .catch(err => {
-                        commit(types.UPDATE_ROLLBACK, file)
-                        reject(err)
-                    })
-                    .finally(() => {
-                        setTimeout(() => {
-                            commit(types.SHOW_PROGRESS, { id: file.id, show: false })
-                        }, 300)
-                    })
-            } catch (err) {
-                commit(types.UPDATE_ROLLBACK, file)
-                reject(err)
+            let formData = new FormData()
+            formData.append('file', file)
+            file = {
+                id: new Date().toISOString(),
+                fileName: file.name,
+                filePath: '',
+                updateTime: new Date().toString(),
+                fileSize: file.size,
+                progress: 0,
+                downloading: false,
+                cancelSource: axios.CancelToken.source()
             }
+            const cancelToken = file.cancelSource.token
+            commit(types.UPLOAD, file)
+            commit(types.SHOW_PROGRESS, { id: file.id, show: true })
+            const onUploadProgress = progressEvent => {
+                commit(types.CHANGE_PROGRESS, { id: file.id, progressEvent })
+            }
+            api.upload({ file: formData, onUploadProgress, cancelToken })
+                .then(res => {
+                    if (res.code === 100) {
+                        dispatch(types.GET_FILE_LIST)
+                        resolve(res)
+                    } else {
+                        reject(res)
+                    }
+                })
+                .catch(err => {
+                    commit(types.UPDATE_ROLLBACK, file)
+                    reject(err)
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        commit(types.SHOW_PROGRESS, { id: file.id, show: false })
+                    }, 300)
+                })
         })
     },
 
@@ -129,33 +126,46 @@ const actions = {
         return new Promise((resolve, reject) => {
             const cancelToken = file.cancelSource.token
             let { fileName, id } = file
-            try {
-                commit(types.SHOW_PROGRESS, { id, show: true })
-                const onDownloadProgress = (progressEvent) => {
-                    commit(types.CHANGE_PROGRESS, { id, progressEvent })
-                }
-                api.download({ filename: fileName, onDownloadProgress, cancelToken })
-                    .then(res => {
-                        resolve(res)
-                    })
-                    .catch(err => {
-                        commit(types.SET_CANCEL_TOKEN, file)
-                        reject(err)
-                    })
-                    .finally(() => {
-                        setTimeout(() => {
-                            commit(types.SHOW_PROGRESS, { id, show: false })
-                        }, 300)
-                    })
-            } catch (err) {
-                commit(types.SHOW_PROGRESS, { id, show: false })
-                reject(err)
+            commit(types.SHOW_PROGRESS, { id, show: true })
+            const onDownloadProgress = (progressEvent) => {
+                commit(types.CHANGE_PROGRESS, { id, progressEvent })
             }
+            api.download({ filename: fileName, onDownloadProgress, cancelToken })
+                .then(res => {
+                    resolve(res)
+                })
+                .catch(err => {
+                    commit(types.SET_CANCEL_TOKEN, file)
+                    reject(err)
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        commit(types.SHOW_PROGRESS, { id, show: false })
+                    }, 300)
+                })
         })
     },
 
     [types.REQUEST_CANCEL]({ commit }, { file, message }) {
         commit(types.REQUEST_CANCEL, { file, message })
+    },
+
+    [types.DELETE]({ commit }, { file }) {
+        return new Promise((resolve, reject) => {
+            const cache = file
+            commit(types.DELETE, file)
+            api.deleteFile(file.id).then(res => {
+                if (res.code === 100) {
+                    resolve(res)
+                } else {
+                    commit(types.DELETE_ROLLBACK, cache)
+                    reject(res)
+                }
+            }).catch(err => {
+                commit(types.DELETE_ROLLBACK, cache)
+                reject(err)
+            })
+        })
     }
 }
 

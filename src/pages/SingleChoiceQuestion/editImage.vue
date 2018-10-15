@@ -22,6 +22,7 @@
           <v-upload
             max-height="60px"
             max-width="60px"
+            accept="image/png,image/gif,image/jpeg"
             v-model="form.titlePicture"
             :src="form.titleSrc"
           />
