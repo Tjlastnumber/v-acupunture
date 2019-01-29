@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import { mapState, map } from "vuex"
-import * as types from "@/store/moduls/single-choice/singleChoice-types"
+import { mapState } from "vuex"
+import * as types from "@/store/moduls/single-choice/single-choice-types"
 import editImage from "./EditImage"
 
 export default {
@@ -91,7 +91,6 @@ export default {
    * 首次导航到组件时会触发
    */
   created() {
-    console.log("第一次导航到组件");
     this.getById();
   },
 

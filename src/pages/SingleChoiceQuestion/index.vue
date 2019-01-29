@@ -158,7 +158,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import * as types from '../../store/moduls/single-choice/singleChoice-types'
+import * as types from '../../store/moduls/single-choice/single-choice-types'
 
 export default {
   name: 'SingleChoice',

@@ -1,4 +1,4 @@
-export const NAMESPACED = 'singleChoice/'
+export const NAMESPACED = 'single-choice/'
 
 export const SET_SINGLE_CHOICE = 'setSingleChoice'
 

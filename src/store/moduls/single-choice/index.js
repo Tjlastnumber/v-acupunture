@@ -1,6 +1,6 @@
 import { toFormData } from '../../../utils/util'
 import api from '../../../api/single-choice'
-import * as types from './singleChoice-types'
+import * as types from './single-choice-types'
 
 /**
  * 编辑状态
@@ -117,8 +117,12 @@ const actions = {
                 api.getPages({
                     data: param
                 }).then(res => {
-                    commit(types.SET_SINGLE_CHOICE, res.extend.singlechoice)
-                    resolve()
+                    if (res.code === 100) {
+                        commit(types.SET_SINGLE_CHOICE, res.extend.singlechoice)
+                        resolve()
+                    } else {
+                        reject(res)
+                    }
                 }).catch(err => {
                     reject(err)
                 }).finally(
@@ -312,9 +316,8 @@ const actions = {
     },
 
     [types.EDIT_DATA]({ commit }, item) {
-        return new Promise((resolve, reject) => {
+        return new Promise(() => {
             commit(types.EDIT_DATA, item)
-            
         })
     }
 }

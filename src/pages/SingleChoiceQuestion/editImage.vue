@@ -60,9 +60,9 @@
 
 <script>
 import { mapState } from "vuex";
-import * as types from '../../store/moduls/single-choice/singleChoice-types'
+import * as types from '../../store/moduls/single-choice/single-choice-types'
 import vUpload from "@/components/UpLoad";
-import { deepFreeze } from "../../utils/util";
+// import { deepFreeze } from "../../utils/util";
 
 export default {
   components: {
@@ -146,9 +146,7 @@ export default {
   },
   methods: {
     editText() {
-      this.$router.push({
-        name: "EditText"
-      });
+      this.$router.push({ name: "EditText" });
     },
     close() {
       this.$store.commit(types.NAMESPACED + types.END_EDIT)
@@ -178,33 +176,55 @@ export default {
 
       if (this.data.id) {
         // 修改
-        this.$store.dispatch(types.NAMESPACED + types.UPDATE_IMAGE, { id: this.data.id, data: data })
-        .then(res => {
+        this.$store.dispatch(types.NAMESPACED + types.UPDATE_IMAGE, { 
+            id: this.data.id, 
+            data: data 
+          }).then(() => {
           this.$store.dispatch(types.NAMESPACED + types.RELOAD)
           this.$store.commit(types.NAMESPACED + types.END_EDIT)
-        }).catch(err=>console.error(err))
+        }).catch(err => 
+          /*eslint no-console: "off"*/
+          console.error(err)
+        )
       } else {
         // 添加
         this.$store
           .dispatch(types.NAMESPACED + types.ADDIMAGE, data)
-          .then(res => {
+          .then(() => {
             this.$store.dispatch(types.NAMESPACED + types.RELOAD)
             this.$store.commit(types.NAMESPACED + types.END_EDIT)
           })
-          .catch(err => console.error(err))
+          .catch(err => 
+            /*eslint no-console: "off"*/
+            console.error(err)
+          )
       }
     },
     getById() {
-      let val = (this.data = this.$store.getters[
+      let val = this.data = this.$store.getters[
         types.NAMESPACED + types.GET_QUESTION_BY_ID
-      ](this.$route.params.id));
+      ](this.$route.params.id);
       this.form.id = val.id;
       this.form.title = val.title;
       this.form.answer = val.answer;
-      if (val.titleimagepath)
+      if (val.titleimagepath) {
         this.form.titlePicture = this.resourcePath + val.titleimagepath;
-      let { picturepatha, picturepathb, picturepathc, picturepathd, picturepathe } = val;
-      new Array( picturepatha, picturepathb, picturepathc, picturepathd, picturepathe).forEach((o, index) => {
+      }
+
+      let { 
+        picturepatha, 
+        picturepathb, 
+        picturepathc, 
+        picturepathd, 
+        picturepathe 
+      } = val;
+
+      new Array(
+        picturepatha, 
+        picturepathb, 
+        picturepathc, 
+        picturepathd, 
+        picturepathe).forEach((o, index) => {
         if (o) {
           this.form.options[index].file = this.resourcePath + o
         } else {

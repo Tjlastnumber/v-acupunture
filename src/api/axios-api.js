@@ -1,3 +1,5 @@
+/*eslint no-console: "off"*/
+
 /**
  * axios api 封装
  */
@@ -9,6 +11,7 @@ export default function $axios(options) {
         const instance = axios.create({
             baseURL: config.baseUrl,
             headers: config.headers,
+            withCredentials: config.withCredentials
             // transformResponse: [data => { }]
         })
 
@@ -37,8 +40,9 @@ export default function $axios(options) {
                 return config
             },
             error => {
-                if (axios.isCancel(err)) {
-                    console.log('axios request cancel ->' + err.message)
+                if (axios.isCancel(error)) {
+
+                    console.log('axios request cancel ->' + error.message)
                 }
                 // 请求错误时做些事(接口错误、超时等)
                 //  1.判断请求超时
