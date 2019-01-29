@@ -1,3 +1,5 @@
+export const NAMESPACED = 'single-choice/'
+
 export const SET_SINGLE_CHOICE = 'setSingleChoice'
 
 export const GET_QUESTION_BY_ID = 'getQuestionById'
@@ -22,6 +24,8 @@ export const ADD = 'add'
 
 export const ADDIMAGE = 'addImage'
 
+export const UPDATE_IMAGE = 'updateImage'
+
 export const LOADING = 'loading'
 
 export const SET_QUERY = 'setQuery'
@@ -30,4 +34,3 @@ export const EDIT_DATA = 'editData'
 
 export const RELOAD = 'reload'
 
-export const NAMESPACED = 'singleChoice/'

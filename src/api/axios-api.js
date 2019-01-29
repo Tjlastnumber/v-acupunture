@@ -1,16 +1,17 @@
+/*eslint no-console: "off"*/
+
 /**
  * axios api 封装
  */
-
 import axios from 'axios'
 import config from './config.js'
-import qs from 'qs'
 
 export default function $axios(options) {
     return new Promise((resolve, reject) => {
         const instance = axios.create({
             baseURL: config.baseUrl,
             headers: config.headers,
+            withCredentials: config.withCredentials
             // transformResponse: [data => { }]
         })
 
@@ -39,6 +40,10 @@ export default function $axios(options) {
                 return config
             },
             error => {
+                if (axios.isCancel(error)) {
+
+                    console.log('axios request cancel ->' + error.message)
+                }
                 // 请求错误时做些事(接口错误、超时等)
                 //  1.判断请求超时
                 if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {

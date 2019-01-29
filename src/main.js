@@ -5,7 +5,7 @@ import store from './store'
 import './plugins/vuetify'
 import App from './App.vue'
 import router from './router'
-import './directive/format'
+import './directive/directive'
 import './store/types'
 
 Vue.use(api)
